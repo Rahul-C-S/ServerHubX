@@ -13,6 +13,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Network,
+  Activity,
+  Clock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/uiStore';
@@ -34,6 +36,8 @@ const navItems: NavItem[] = [
   { icon: Network, label: 'DNS', href: '/dns' },
   { icon: Mail, label: 'Email', href: '/mail' },
   { icon: HardDrive, label: 'Backups', href: '/backups' },
+  { icon: Activity, label: 'Monitoring', href: '/monitoring' },
+  { icon: Clock, label: 'Cron Jobs', href: '/cron' },
   { icon: Terminal, label: 'Terminal', href: '/terminal' },
   { icon: Users, label: 'Users', href: '/users', roles: ['ROOT_ADMIN', 'RESELLER'] },
   { icon: Settings, label: 'Settings', href: '/settings' },

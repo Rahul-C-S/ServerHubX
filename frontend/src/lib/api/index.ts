@@ -9,3 +9,7 @@ export * from './ssl';
 export * from './mail';
 export * from './terminal';
 export * from './files';
+export * from './backups';
+export * from './monitoring';
+export * from './notifications';
+export * from './cron';

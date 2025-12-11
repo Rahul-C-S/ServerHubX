@@ -7,6 +7,10 @@ export * from './ssl';
 export * from './mail';
 export * from './terminal';
 export * from './files';
+export * from './backup';
+export * from './monitoring';
+export * from './notification';
+export * from './cron';
 
 export interface ApiError {
   message: string;

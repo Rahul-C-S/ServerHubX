@@ -23,6 +23,10 @@ import {
   MailDomainDetailPage,
   TerminalPage,
   FilesPage,
+  BackupsPage,
+  MonitoringPage,
+  SettingsPage,
+  CronPage,
 } from '@/pages';
 
 function AppContent() {
@@ -64,11 +68,13 @@ function AppContent() {
         <Route path="/dns/:id" element={<DnsZoneDetailPage />} />
         <Route path="/mail" element={<MailPage />} />
         <Route path="/mail/:id" element={<MailDomainDetailPage />} />
-        <Route path="/backups" element={<PlaceholderPage title="Backups" />} />
+        <Route path="/backups" element={<BackupsPage />} />
+        <Route path="/monitoring" element={<MonitoringPage />} />
+        <Route path="/cron" element={<CronPage />} />
         <Route path="/terminal" element={<TerminalPage />} />
         <Route path="/files" element={<FilesPage />} />
         <Route path="/users" element={<UsersPage />} />
-        <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
       {/* Redirect root to dashboard */}
@@ -77,21 +83,6 @@ function AppContent() {
       {/* 404 */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
-  );
-}
-
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="flex items-center justify-center h-64">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
-          {title}
-        </h1>
-        <p className="text-surface-500 dark:text-surface-400 mt-2">
-          This page will be implemented in Phase 2
-        </p>
-      </div>
-    </div>
   );
 }
 

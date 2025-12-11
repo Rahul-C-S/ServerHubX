@@ -26,6 +26,10 @@ import { SslModule } from './modules/ssl/ssl.module.js';
 import { MailModule } from './modules/mail/mail.module.js';
 import { TerminalModule } from './modules/terminal/terminal.module.js';
 import { FileManagerModule } from './modules/file-manager/file-manager.module.js';
+import { BackupsModule } from './modules/backups/backups.module';
+import { MonitoringModule } from './modules/monitoring/monitoring.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { CronModule } from './modules/cron/cron.module';
 
 @Module({
   imports: [
@@ -79,6 +83,10 @@ import { FileManagerModule } from './modules/file-manager/file-manager.module.js
     MailModule,
     TerminalModule,
     FileManagerModule,
+    BackupsModule,
+    MonitoringModule,
+    NotificationsModule,
+    CronModule,
   ],
   controllers: [AppController],
   providers: [

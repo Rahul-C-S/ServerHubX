@@ -20,6 +20,7 @@ export enum AuditOperationType {
   SERVICE_STOP = 'SERVICE_STOP',
   SERVICE_RESTART = 'SERVICE_RESTART',
   FIREWALL_CHANGE = 'FIREWALL_CHANGE',
+  EXECUTE = 'EXECUTE',
 }
 
 export enum AuditResourceType {
@@ -34,10 +35,14 @@ export enum AuditResourceType {
   MAILBOX = 'MAILBOX',
   MAIL_ALIAS = 'MAIL_ALIAS',
   BACKUP = 'BACKUP',
+  BACKUP_SCHEDULE = 'BACKUP_SCHEDULE',
   CRON_JOB = 'CRON_JOB',
   SERVICE = 'SERVICE',
   FIREWALL = 'FIREWALL',
   SYSTEM = 'SYSTEM',
+  ALERT_RULE = 'ALERT_RULE',
+  ALERT = 'ALERT',
+  NOTIFICATION = 'NOTIFICATION',
 }
 
 export enum AuditSeverity {

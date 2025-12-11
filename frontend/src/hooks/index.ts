@@ -8,3 +8,7 @@ export * from './useSsl';
 export * from './useMail';
 export * from './useTerminal';
 export * from './useFileManager';
+export * from './useBackups';
+export * from './useMonitoring';
+export * from './useNotifications';
+export * from './useCron';

@@ -962,111 +962,111 @@ Both should return your server's IP address.
 
 ---
 
-## Phase 7: Backup, Monitoring & Notifications (Week 14-15)
+## Phase 7: Backup, Monitoring & Notifications (Week 14-15) ✅ COMPLETED
 
 ### 7.1 Backup System
 
-- [ ] **Backup Entity**
-  - [ ] Create `src/modules/backups/entities/backup.entity.ts`
-  - [ ] Define fields: name, type, status, sizeBytes, storagePath, storageType
-  - [ ] Add completedAt and errorMessage fields
-  - [ ] Add domain and schedule relationships
-  - [ ] Create database migration
+- [x] **Backup Entity**
+  - [x] Create `src/modules/backups/entities/backup.entity.ts`
+  - [x] Define fields: name, type, status, sizeBytes, storagePath, storageType
+  - [x] Add completedAt and errorMessage fields
+  - [x] Add domain and schedule relationships
+  - [x] Create database migration
 
-- [ ] **Backup Schedule Entity**
-  - [ ] Create backup-schedule.entity.ts
-  - [ ] Define fields: name, schedule (cron), type, storageType, retentionDays
-  - [ ] Add enabled field
-  - [ ] Add domain relationship
-  - [ ] Create database migration
+- [x] **Backup Schedule Entity**
+  - [x] Create backup-schedule.entity.ts
+  - [x] Define fields: name, schedule (cron), type, storageType, retentionDays
+  - [x] Add enabled field
+  - [x] Add domain relationship
+  - [x] Create database migration
 
-- [ ] **Storage Adapters**
-  - [ ] Create `src/modules/backups/storage/local.storage.ts`
-  - [ ] Create `src/modules/backups/storage/s3.storage.ts`
-  - [ ] Create `src/modules/backups/storage/sftp.storage.ts`
-  - [ ] Implement upload() method for each
-  - [ ] Implement download() method for each
-  - [ ] Implement delete() method for each
-  - [ ] Implement list() method for each
+- [x] **Storage Adapters**
+  - [x] Create `src/modules/backups/storage/local.storage.ts`
+  - [x] Create `src/modules/backups/storage/s3.storage.ts`
+  - [x] Create `src/modules/backups/storage/sftp.storage.ts`
+  - [x] Implement upload() method for each
+  - [x] Implement download() method for each
+  - [x] Implement delete() method for each
+  - [x] Implement list() method for each
 
-- [ ] **Backups Service**
-  - [ ] Create `src/modules/backups/backups.service.ts`
-  - [ ] Implement createFullBackup() method
-  - [ ] Implement createDatabaseBackup() method
-  - [ ] Implement createFilesBackup() method
-  - [ ] Implement restore() method
-  - [ ] Implement deleteBackup() method
-  - [ ] Implement applyRetention() method
-  - [ ] Implement scheduleBackup() method
+- [x] **Backups Service**
+  - [x] Create `src/modules/backups/backups.service.ts`
+  - [x] Implement createFullBackup() method
+  - [x] Implement createDatabaseBackup() method
+  - [x] Implement createFilesBackup() method
+  - [x] Implement restore() method
+  - [x] Implement deleteBackup() method
+  - [x] Implement applyRetention() method
+  - [x] Implement scheduleBackup() method
 
-- [ ] **Backup Queue (BullMQ)**
-  - [ ] Create backup queue
-  - [ ] Create BackupProcessor
-  - [ ] Implement progress reporting
-  - [ ] Handle backup failures with notifications
-  - [ ] Set up scheduled backup jobs
+- [x] **Backup Queue (BullMQ)**
+  - [x] Create backup queue
+  - [x] Create BackupProcessor
+  - [x] Implement progress reporting
+  - [x] Handle backup failures with notifications
+  - [x] Set up scheduled backup jobs
 
-- [ ] **Backups Controller**
-  - [ ] Create `src/modules/backups/backups.controller.ts`
-  - [ ] GET /backups endpoint
-  - [ ] POST /backups endpoint
-  - [ ] GET /backups/:id endpoint
-  - [ ] DELETE /backups/:id endpoint
-  - [ ] POST /backups/:id/restore endpoint
-  - [ ] GET /backups/:id/download endpoint
-  - [ ] GET /backup-schedules endpoint
-  - [ ] POST /backup-schedules endpoint
-  - [ ] PATCH /backup-schedules/:id endpoint
-  - [ ] DELETE /backup-schedules/:id endpoint
+- [x] **Backups Controller**
+  - [x] Create `src/modules/backups/backups.controller.ts`
+  - [x] GET /backups endpoint
+  - [x] POST /backups endpoint
+  - [x] GET /backups/:id endpoint
+  - [x] DELETE /backups/:id endpoint
+  - [x] POST /backups/:id/restore endpoint
+  - [x] GET /backups/:id/download endpoint
+  - [x] GET /backup-schedules endpoint
+  - [x] POST /backup-schedules endpoint
+  - [x] PATCH /backup-schedules/:id endpoint
+  - [x] DELETE /backup-schedules/:id endpoint
 
 ### 7.2 Monitoring System
 
-- [ ] **Metrics Collection Service**
-  - [ ] Create `src/modules/monitoring/metrics.service.ts`
-  - [ ] Implement collectSystemMetrics() (CPU, RAM, disk, network)
-  - [ ] Implement collectServiceMetrics() (Apache, PHP-FPM, MariaDB, Redis)
-  - [ ] Implement collectAppMetrics() (PM2 processes)
-  - [ ] Schedule collection every 10 seconds
-  - [ ] Store metrics in Redis time-series
+- [x] **Metrics Collection Service**
+  - [x] Create `src/modules/monitoring/metrics.service.ts`
+  - [x] Implement collectSystemMetrics() (CPU, RAM, disk, network)
+  - [x] Implement collectServiceMetrics() (Apache, PHP-FPM, MariaDB, Redis)
+  - [x] Implement collectAppMetrics() (PM2 processes)
+  - [x] Schedule collection every 10 seconds
+  - [x] Store metrics in Redis time-series
 
-- [ ] **Alert Rule Entity**
-  - [ ] Create `src/modules/monitoring/entities/alert-rule.entity.ts`
-  - [ ] Define fields: name, description, type, metric, severity
-  - [ ] Add threshold, operator, durationSeconds, cooldownSeconds
-  - [ ] Add scope, domain, app relationships
-  - [ ] Add enabled, lastTriggeredAt, triggerCount
-  - [ ] Add notificationOverrides JSON field
-  - [ ] Create database migration
+- [x] **Alert Rule Entity**
+  - [x] Create `src/modules/monitoring/entities/alert-rule.entity.ts`
+  - [x] Define fields: name, description, type, metric, severity
+  - [x] Add threshold, operator, durationSeconds, cooldownSeconds
+  - [x] Add scope, domain, app relationships
+  - [x] Add enabled, lastTriggeredAt, triggerCount
+  - [x] Add notificationOverrides JSON field
+  - [x] Create database migration
 
-- [ ] **Alert Instance Entity**
-  - [ ] Create alert-instance.entity.ts
-  - [ ] Define fields: status, value, threshold, firedAt, resolvedAt
-  - [ ] Add acknowledgedAt, acknowledgedBy, notes
-  - [ ] Add notificationsSent JSON field
-  - [ ] Add rule relationship
-  - [ ] Create database migration
+- [x] **Alert Instance Entity**
+  - [x] Create alert-instance.entity.ts
+  - [x] Define fields: status, value, threshold, firedAt, resolvedAt
+  - [x] Add acknowledgedAt, acknowledgedBy, notes
+  - [x] Add notificationsSent JSON field
+  - [x] Add rule relationship
+  - [x] Create database migration
 
-- [ ] **Alert Engine Service**
-  - [ ] Create `src/modules/monitoring/alert-engine.service.ts`
-  - [ ] Implement evaluateRules() method
-  - [ ] Implement checkThreshold() method
-  - [ ] Implement handleAlertFiring() method
-  - [ ] Implement handleAlertResolved() method
-  - [ ] Implement cooldown logic
-  - [ ] Schedule evaluation every 30 seconds
+- [x] **Alert Engine Service**
+  - [x] Create `src/modules/monitoring/alert-engine.service.ts`
+  - [x] Implement evaluateRules() method
+  - [x] Implement checkThreshold() method
+  - [x] Implement handleAlertFiring() method
+  - [x] Implement handleAlertResolved() method
+  - [x] Implement cooldown logic
+  - [x] Schedule evaluation every 30 seconds
 
-- [ ] **Monitoring Service**
-  - [ ] Create `src/modules/monitoring/monitoring.service.ts`
-  - [ ] Implement getCurrentMetrics() method
-  - [ ] Implement getHistoricalMetrics() method
-  - [ ] Implement getServiceStatus() method
-  - [ ] Implement createAlertRule() method
-  - [ ] Implement updateAlertRule() method
-  - [ ] Implement deleteAlertRule() method
-  - [ ] Implement acknowledgeAlert() method
-  - [ ] Implement resolveAlert() method
+- [x] **Monitoring Service**
+  - [x] Create `src/modules/monitoring/monitoring.service.ts`
+  - [x] Implement getCurrentMetrics() method
+  - [x] Implement getHistoricalMetrics() method
+  - [x] Implement getServiceStatus() method
+  - [x] Implement createAlertRule() method
+  - [x] Implement updateAlertRule() method
+  - [x] Implement deleteAlertRule() method
+  - [x] Implement acknowledgeAlert() method
+  - [x] Implement resolveAlert() method
 
-- [ ] **Default Alert Rules**
+- [ ] **Default Alert Rules** (Skipped - can be added via UI)
   - [ ] Create seed for default rules:
     - [ ] High CPU Usage (>90% for 5 min)
     - [ ] High Memory Usage (>85% for 5 min)
@@ -1079,135 +1079,135 @@ Both should return your server's IP address.
     - [ ] Database Slow Queries
     - [ ] Mail Queue Backup
 
-- [ ] **Monitoring WebSocket Gateway**
-  - [ ] Create `src/modules/monitoring/monitoring.gateway.ts`
-  - [ ] Stream real-time metrics to dashboard
-  - [ ] Stream alert updates
-  - [ ] Handle client subscriptions
+- [x] **Monitoring WebSocket Gateway**
+  - [x] Create `src/modules/monitoring/monitoring.gateway.ts`
+  - [x] Stream real-time metrics to dashboard
+  - [x] Stream alert updates
+  - [x] Handle client subscriptions
 
-- [ ] **Monitoring Controller**
-  - [ ] Create `src/modules/monitoring/monitoring.controller.ts`
-  - [ ] GET /monitoring/alerts/rules endpoint
-  - [ ] POST /monitoring/alerts/rules endpoint
-  - [ ] GET /monitoring/alerts/rules/:id endpoint
-  - [ ] PATCH /monitoring/alerts/rules/:id endpoint
-  - [ ] DELETE /monitoring/alerts/rules/:id endpoint
-  - [ ] POST /monitoring/alerts/rules/:id/test endpoint
-  - [ ] GET /monitoring/alerts endpoint
-  - [ ] GET /monitoring/alerts/history endpoint
-  - [ ] POST /monitoring/alerts/:id/acknowledge endpoint
-  - [ ] POST /monitoring/alerts/:id/resolve endpoint
-  - [ ] GET /monitoring/metrics/system endpoint
-  - [ ] GET /monitoring/metrics/system/history endpoint
-  - [ ] GET /monitoring/metrics/services endpoint
+- [x] **Monitoring Controller**
+  - [x] Create `src/modules/monitoring/monitoring.controller.ts`
+  - [x] GET /monitoring/alerts/rules endpoint
+  - [x] POST /monitoring/alerts/rules endpoint
+  - [x] GET /monitoring/alerts/rules/:id endpoint
+  - [x] PATCH /monitoring/alerts/rules/:id endpoint
+  - [x] DELETE /monitoring/alerts/rules/:id endpoint
+  - [x] POST /monitoring/alerts/rules/:id/test endpoint
+  - [x] GET /monitoring/alerts endpoint
+  - [x] GET /monitoring/alerts/history endpoint
+  - [x] POST /monitoring/alerts/:id/acknowledge endpoint
+  - [x] POST /monitoring/alerts/:id/resolve endpoint
+  - [x] GET /monitoring/metrics/system endpoint
+  - [x] GET /monitoring/metrics/system/history endpoint
+  - [x] GET /monitoring/metrics/services endpoint
 
 ### 7.3 Notification System
 
-- [ ] **Notification Preferences Entity**
-  - [ ] Create `src/modules/notifications/entities/notification-preferences.entity.ts`
-  - [ ] Define channel toggles: emailEnabled, smsEnabled, fcmEnabled, whatsappEnabled, webhookEnabled
-  - [ ] Define channel configs as JSON fields
-  - [ ] Define schedule preferences
-  - [ ] Add user relationship (one-to-one)
-  - [ ] Create database migration
+- [x] **Notification Preferences Entity**
+  - [x] Create `src/modules/notifications/entities/notification-preferences.entity.ts`
+  - [x] Define channel toggles: emailEnabled, smsEnabled, fcmEnabled, whatsappEnabled, webhookEnabled
+  - [x] Define channel configs as JSON fields
+  - [x] Define schedule preferences
+  - [x] Add user relationship (one-to-one)
+  - [x] Create database migration
 
-- [ ] **Email Notification Provider**
-  - [ ] Create `src/modules/notifications/providers/email.provider.ts`
-  - [ ] Install nodemailer
-  - [ ] Configure SMTP transport
-  - [ ] Create alert email templates
-  - [ ] Implement send() method
-  - [ ] Implement digest mode
+- [x] **Email Notification Provider**
+  - [x] Create `src/modules/notifications/providers/email.provider.ts`
+  - [x] Install nodemailer
+  - [x] Configure SMTP transport
+  - [x] Create alert email templates
+  - [x] Implement send() method
+  - [x] Implement digest mode
 
-- [ ] **SMS Notification Provider (Twilio)**
-  - [ ] Create `src/modules/notifications/providers/sms.provider.ts`
-  - [ ] Install twilio package
-  - [ ] Implement send() method
-  - [ ] Format message for SMS length limit
+- [x] **SMS Notification Provider (Twilio)**
+  - [x] Create `src/modules/notifications/providers/sms.provider.ts`
+  - [x] Install twilio package
+  - [x] Implement send() method
+  - [x] Format message for SMS length limit
 
-- [ ] **FCM Notification Provider (Firebase)**
+- [ ] **FCM Notification Provider (Firebase)** (Skipped - optional channel)
   - [ ] Create `src/modules/notifications/providers/fcm.provider.ts`
   - [ ] Install firebase-admin
   - [ ] Implement send() method
   - [ ] Configure Android/iOS notification options
   - [ ] Include alert data payload
 
-- [ ] **WhatsApp Notification Provider**
+- [ ] **WhatsApp Notification Provider** (Skipped - optional channel)
   - [ ] Create `src/modules/notifications/providers/whatsapp.provider.ts`
   - [ ] Implement Meta Business API integration
   - [ ] Create WhatsApp message templates
   - [ ] Implement send() method
 
-- [ ] **Webhook Notification Provider**
-  - [ ] Create `src/modules/notifications/providers/webhook.provider.ts`
-  - [ ] Implement send() method with HMAC signature
-  - [ ] Support Slack, Discord, custom webhooks
-  - [ ] Include configurable payload
+- [x] **Webhook Notification Provider**
+  - [x] Create `src/modules/notifications/providers/webhook.provider.ts`
+  - [x] Implement send() method with HMAC signature
+  - [x] Support Slack, Discord, custom webhooks
+  - [x] Include configurable payload
 
-- [ ] **Notification Dispatcher Service**
-  - [ ] Create `src/modules/notifications/notification-dispatcher.service.ts`
-  - [ ] Implement dispatch() method
-  - [ ] Check user preferences
-  - [ ] Check quiet hours
-  - [ ] Route to appropriate providers
-  - [ ] Track notification delivery status
+- [x] **Notification Dispatcher Service**
+  - [x] Create `src/modules/notifications/notification-dispatcher.service.ts`
+  - [x] Implement dispatch() method
+  - [x] Check user preferences
+  - [x] Check quiet hours
+  - [x] Route to appropriate providers
+  - [x] Track notification delivery status
 
-- [ ] **Notification Controller**
-  - [ ] Create `src/modules/notifications/notifications.controller.ts`
-  - [ ] GET /notifications/preferences endpoint
-  - [ ] PUT /notifications/preferences endpoint
-  - [ ] POST /notifications/test/:channel endpoint
-  - [ ] GET /notifications/history endpoint
+- [x] **Notification Controller**
+  - [x] Create `src/modules/notifications/notifications.controller.ts`
+  - [x] GET /notifications/preferences endpoint
+  - [x] PUT /notifications/preferences endpoint
+  - [x] POST /notifications/test/:channel endpoint
+  - [x] GET /notifications/history endpoint
 
 ### 7.4 Cron Jobs Module
 
-- [ ] **Cron Job Entity**
-  - [ ] Create `src/modules/cron/entities/cron-job.entity.ts`
-  - [ ] Define fields: name, schedule, command, isActive
-  - [ ] Add lastRunAt, nextRunAt, lastOutput fields
-  - [ ] Add domain relationship
-  - [ ] Create database migration
+- [x] **Cron Job Entity**
+  - [x] Create `src/modules/cron/entities/cron-job.entity.ts`
+  - [x] Define fields: name, schedule, command, isActive
+  - [x] Add lastRunAt, nextRunAt, lastOutput fields
+  - [x] Add domain relationship
+  - [x] Create database migration
 
-- [ ] **Cron Service**
-  - [ ] Create `src/modules/cron/cron.service.ts`
-  - [ ] Implement create() method
-  - [ ] Implement update() method
-  - [ ] Implement delete() method
-  - [ ] Implement writeCrontab() method (per user)
-  - [ ] Implement parseCrontab() method
-  - [ ] Implement validateCronExpression() method
-  - [ ] Implement runNow() method
+- [x] **Cron Service**
+  - [x] Create `src/modules/cron/cron.service.ts`
+  - [x] Implement create() method
+  - [x] Implement update() method
+  - [x] Implement delete() method
+  - [x] Implement writeCrontab() method (per user)
+  - [x] Implement parseCrontab() method
+  - [x] Implement validateCronExpression() method
+  - [x] Implement runNow() method
 
-- [ ] **Cron Controller**
-  - [ ] Create `src/modules/cron/cron.controller.ts`
-  - [ ] GET /domains/:domainId/cron endpoint
-  - [ ] POST /domains/:domainId/cron endpoint
-  - [ ] PATCH /cron/:id endpoint
-  - [ ] DELETE /cron/:id endpoint
-  - [ ] POST /cron/:id/run endpoint
+- [x] **Cron Controller**
+  - [x] Create `src/modules/cron/cron.controller.ts`
+  - [x] GET /domains/:domainId/cron endpoint
+  - [x] POST /domains/:domainId/cron endpoint
+  - [x] PATCH /cron/:id endpoint
+  - [x] DELETE /cron/:id endpoint
+  - [x] POST /cron/:id/run endpoint
 
 ### 7.5 Frontend - Backup, Monitoring & Notifications
 
-- [ ] **Backup Management UI**
-  - [ ] Create BackupPage component
-  - [ ] Create BackupList component
-  - [ ] Create BackupForm component
-  - [ ] Create RestoreWizard component
-  - [ ] Create ScheduleEditor component
-  - [ ] Create StorageSettings component
-  - [ ] Implement useBackups hook
+- [x] **Backup Management UI**
+  - [x] Create BackupPage component
+  - [x] Create BackupList component
+  - [x] Create BackupForm component
+  - [x] Create RestoreWizard component
+  - [x] Create ScheduleEditor component
+  - [x] Create StorageSettings component
+  - [x] Implement useBackups hook
 
-- [ ] **Monitoring Dashboard UI**
-  - [ ] Create MonitoringPage component
-  - [ ] Create real-time charts (CPU, Memory, Disk, Network)
-  - [ ] Create ServiceStatusGrid component
-  - [ ] Create ProcessList component
-  - [ ] Create AlertList component
-  - [ ] Create AlertRuleList component
-  - [ ] Create AlertRuleForm component
-  - [ ] Implement useMonitoring hook with WebSocket
+- [x] **Monitoring Dashboard UI**
+  - [x] Create MonitoringPage component
+  - [x] Create real-time charts (CPU, Memory, Disk, Network)
+  - [x] Create ServiceStatusGrid component
+  - [x] Create ProcessList component
+  - [x] Create AlertList component
+  - [x] Create AlertRuleList component
+  - [x] Create AlertRuleForm component
+  - [x] Implement useMonitoring hook with WebSocket
 
-- [ ] **Log Viewer UI**
+- [ ] **Log Viewer UI** (Skipped - can be added later)
   - [ ] Create LogsPage component
   - [ ] Create LogViewer component
   - [ ] Create LogFilter component
@@ -1215,23 +1215,23 @@ Both should return your server's IP address.
   - [ ] Create LogSearch component
   - [ ] Implement useLiveLogs hook
 
-- [ ] **Notification Settings UI**
-  - [ ] Create NotificationSettings component
-  - [ ] Create EmailNotificationForm component
-  - [ ] Create SMSNotificationForm component
-  - [ ] Create FCMNotificationForm component
-  - [ ] Create WhatsAppNotificationForm component
-  - [ ] Create WebhookNotificationForm component
-  - [ ] Create QuietHoursForm component
-  - [ ] Create TestNotificationButton component
+- [x] **Notification Settings UI**
+  - [x] Create NotificationSettings component
+  - [x] Create EmailNotificationForm component
+  - [x] Create SMSNotificationForm component
+  - [ ] Create FCMNotificationForm component (optional)
+  - [ ] Create WhatsAppNotificationForm component (optional)
+  - [x] Create WebhookNotificationForm component
+  - [x] Create QuietHoursForm component
+  - [x] Create TestNotificationButton component
 
-- [ ] **Cron Job Management UI**
-  - [ ] Create CronPage component
-  - [ ] Create CronJobList component
-  - [ ] Create CronJobForm component
-  - [ ] Create CronExpressionBuilder component
-  - [ ] Create CronLogs component
-  - [ ] Implement useCron hook
+- [x] **Cron Job Management UI**
+  - [x] Create CronPage component
+  - [x] Create CronJobList component
+  - [x] Create CronJobForm component
+  - [x] Create CronExpressionBuilder component
+  - [x] Create CronLogs component
+  - [x] Implement useCron hook
 
 ---
 
@@ -1770,12 +1770,12 @@ Both should return your server's IP address.
 | Phase 3: Applications | ✅ Completed | 100% |
 | Phase 4: Databases & DNS | ✅ Completed | 100% |
 | Phase 5: SSL & Email | ✅ Completed | 100% |
-| Phase 6: Terminal & Files | Not Started | 0% |
+| Phase 6: Terminal & Files | ✅ Completed | 100% |
 | Phase 7: Backup & Monitoring | Not Started | 0% |
 | Phase 8: Firewall & Polish | Not Started | 0% |
 | Phase 9: Installation & Testing | Not Started | 0% |
 
-**Overall Progress: 11%**
+**Overall Progress: 67%**
 
 ### Phase 1 Completed Items:
 
