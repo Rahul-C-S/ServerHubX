@@ -79,252 +79,252 @@ Both should return your server's IP address.
 
 - [x] **Initialize NestJS project**
   > Set up the foundational NestJS application with TypeScript. NestJS provides a modular architecture ideal for building scalable server applications with dependency injection, decorators, and a clear separation of concerns.
-  - [ ] Create new NestJS project with TypeScript (`nest new backend`) - generates the basic project structure with main.ts, app.module.ts, and configuration files
-  - [ ] Configure TypeScript strict mode in `tsconfig.json` - enables strict null checks, implicit any errors, and other type safety features to catch bugs at compile time
-  - [ ] Set up path aliases (`@modules`, `@common`, `@core`) - allows cleaner imports like `import { X } from '@modules/auth'` instead of relative paths
-  - [ ] Install core dependencies (class-validator, class-transformer) - class-validator provides DTO validation decorators, class-transformer handles object transformation
+  - [x] Create new NestJS project with TypeScript (`nest new backend`) - generates the basic project structure with main.ts, app.module.ts, and configuration files
+  - [x] Configure TypeScript strict mode in `tsconfig.json` - enables strict null checks, implicit any errors, and other type safety features to catch bugs at compile time
+  - [x] Set up path aliases (`@modules`, `@common`, `@core`) - allows cleaner imports like `import { X } from '@modules/auth'` instead of relative paths
+  - [x] Install core dependencies (class-validator, class-transformer) - class-validator provides DTO validation decorators, class-transformer handles object transformation
 
-- [ ] **Configure Database (MariaDB)**
+- [x] **Configure Database (MariaDB)**
   > MariaDB is the database engine for storing all application data including users, domains, apps, certificates, and audit logs. TypeORM provides an ORM layer with migrations support.
-  - [ ] Install TypeORM and mysql2 packages - TypeORM is the ORM, mysql2 is the MySQL/MariaDB driver
-  - [ ] Create `database.config.ts` with connection settings - externalizes database configuration (host, port, username, password, database name) from environment variables
-  - [ ] Set up TypeORM module in `app.module.ts` - registers TypeORM globally with async configuration loading from ConfigService
-  - [ ] Create base entity with id, createdAt, updatedAt, deletedAt - abstract base class that all entities extend, provides UUID primary key and automatic timestamps
-  - [ ] Configure migrations directory structure - sets up `database/migrations/` for version-controlled schema changes, enables `npm run migration:run` and `migration:generate` commands
+  - [x] Install TypeORM and mysql2 packages - TypeORM is the ORM, mysql2 is the MySQL/MariaDB driver
+  - [x] Create `database.config.ts` with connection settings - externalizes database configuration (host, port, username, password, database name) from environment variables
+  - [x] Set up TypeORM module in `app.module.ts` - registers TypeORM globally with async configuration loading from ConfigService
+  - [x] Create base entity with id, createdAt, updatedAt, deletedAt - abstract base class that all entities extend, provides UUID primary key and automatic timestamps
+  - [x] Configure migrations directory structure - sets up `database/migrations/` for version-controlled schema changes, enables `npm run migration:run` and `migration:generate` commands
 
-- [ ] **Configure Redis**
+- [x] **Configure Redis**
   > Redis serves dual purposes: caching frequently accessed data (sessions, metrics) and powering BullMQ job queues for background tasks like deployments and backups.
-  - [ ] Install ioredis package - high-performance Redis client for Node.js with cluster support
-  - [ ] Create `redis.config.ts` with connection settings - configures Redis host, port, password, and connection pool settings
-  - [ ] Set up Redis module for caching - creates a global cache manager for storing session data, API response caches, and temporary metrics
-  - [ ] Set up BullMQ module for job queues - configures job queues for async tasks: deployment queue, backup queue, ssl-renewal queue, notification queue
+  - [x] Install ioredis package - high-performance Redis client for Node.js with cluster support
+  - [x] Create `redis.config.ts` with connection settings - configures Redis host, port, password, and connection pool settings
+  - [x] Set up Redis module for caching - creates a global cache manager for storing session data, API response caches, and temporary metrics
+  - [x] Set up BullMQ module for job queues - configures job queues for async tasks: deployment queue, backup queue, ssl-renewal queue, notification queue
 
-- [ ] **Configure Environment Variables**
+- [x] **Configure Environment Variables**
   > Centralized configuration management using environment variables. All sensitive data (passwords, API keys) and environment-specific settings are externalized.
-  - [ ] Install @nestjs/config - NestJS module that wraps dotenv with additional features like validation and typed access
-  - [ ] Create `.env.example` with all required variables - template file listing all configuration options: DATABASE_*, REDIS_*, JWT_*, SMTP_*, TWILIO_*, etc.
-  - [ ] Create Joi validation schema for env vars - validates environment variables on startup, fails fast with clear error messages if required vars are missing
-  - [ ] Set up ConfigModule as global - makes ConfigService available in all modules without explicit imports
+  - [x] Install @nestjs/config - NestJS module that wraps dotenv with additional features like validation and typed access
+  - [x] Create `.env.example` with all required variables - template file listing all configuration options: DATABASE_*, REDIS_*, JWT_*, SMTP_*, TWILIO_*, etc.
+  - [x] Create Joi validation schema for env vars - validates environment variables on startup, fails fast with clear error messages if required vars are missing
+  - [x] Set up ConfigModule as global - makes ConfigService available in all modules without explicit imports
 
-- [ ] **Set Up Logging**
+- [x] **Set Up Logging**
   > Comprehensive logging system for debugging, auditing, and monitoring. Uses Winston for flexible log formatting and multiple transports (console, file, remote).
-  - [ ] Install Winston logger - flexible logging library supporting multiple formats and outputs
-  - [ ] Create custom NestJS logger service - wraps Winston in a NestJS LoggerService for framework integration
-  - [ ] Configure log levels (debug, info, warn, error) - debug for development, info for general operations, warn for recoverable issues, error for failures
-  - [ ] Set up log file rotation - uses winston-daily-rotate-file to create daily log files, auto-delete old logs after 30 days, max 100MB per file
-  - [ ] Create request logging middleware - logs all HTTP requests with method, URL, status code, response time, and user ID for debugging and security auditing
+  - [x] Install Winston logger - flexible logging library supporting multiple formats and outputs
+  - [x] Create custom NestJS logger service - wraps Winston in a NestJS LoggerService for framework integration
+  - [x] Configure log levels (debug, info, warn, error) - debug for development, info for general operations, warn for recoverable issues, error for failures
+  - [x] Set up log file rotation - uses winston-daily-rotate-file to create daily log files, auto-delete old logs after 30 days, max 100MB per file
+  - [x] Create request logging middleware - logs all HTTP requests with method, URL, status code, response time, and user ID for debugging and security auditing
 
 ### 1.2 Core System Layer
 
-- [ ] **Command Executor Service**
+- [x] **Command Executor Service**
   > The most critical security component. ALL system commands MUST go through this service. Uses Node.js spawn() with explicit argument arrays (never shell strings) to prevent command injection attacks.
-  - [ ] Create `src/core/executor/command-executor.service.ts` - central service for executing all Linux commands safely
-  - [ ] Implement spawn() wrapper with timeout handling - uses child_process.spawn() with configurable timeout (default 30s), kills process on timeout
-  - [ ] Implement stdout/stderr capture - buffers output for logging and returns to caller, handles large outputs with streaming
-  - [ ] Add sudo execution support - prepends 'sudo' for privileged commands, validates command is in whitelist before elevating
-  - [ ] Add runAs user support - uses 'sudo -u <username>' to run commands as specific Linux user (for file operations in user home directories)
-  - [ ] Create unit tests for executor - tests command building, timeout handling, error capture, and security checks
+  - [x] Create `src/core/executor/command-executor.service.ts` - central service for executing all Linux commands safely
+  - [x] Implement spawn() wrapper with timeout handling - uses child_process.spawn() with configurable timeout (default 30s), kills process on timeout
+  - [x] Implement stdout/stderr capture - buffers output for logging and returns to caller, handles large outputs with streaming
+  - [x] Add sudo execution support - prepends 'sudo' for privileged commands, validates command is in whitelist before elevating
+  - [x] Add runAs user support - uses 'sudo -u <username>' to run commands as specific Linux user (for file operations in user home directories)
+  - [x] Create unit tests for executor - tests command building, timeout handling, error capture, and security checks
 
-- [ ] **Command Whitelist Registry**
+- [x] **Command Whitelist Registry**
   > Security-critical whitelist of allowed system commands. Any command not in this list is rejected. Each command has defined argument patterns for additional validation.
-  - [ ] Create `src/core/executor/command-whitelist.ts` - registry of all allowed commands with argument patterns
-  - [ ] Define user management commands (useradd, userdel, usermod, passwd) - for creating/managing Linux users per domain
-  - [ ] Define Apache commands (a2ensite, a2dissite, apachectl) - for enabling/disabling virtual hosts and reloading Apache
-  - [ ] Define PHP-FPM commands (systemctl for php-fpm) - for managing PHP-FPM service and pools
-  - [ ] Define database commands (mysql, mysqldump) - for database creation, user management, and backups
-  - [ ] Define DNS commands (rndc, named-checkzone) - for Bind9 zone management and validation
-  - [ ] Define mail commands (postmap, postfix) - for Postfix virtual mailbox configuration
-  - [ ] Define certbot commands - for Let's Encrypt certificate requests and renewals
-  - [ ] Define CSF firewall commands (csf, lfd) - csf -r (restart), csf -q (quick restart), csf -l (list), csf -td (temp deny), csf -ta (temp allow), csf -dr (deny remove), csf -t (temp list)
-  - [ ] Define file operation commands (chown, chmod, mkdir, rm) - for file permission and directory management within allowed paths only
+  - [x] Create `src/core/executor/command-whitelist.ts` - registry of all allowed commands with argument patterns
+  - [x] Define user management commands (useradd, userdel, usermod, passwd) - for creating/managing Linux users per domain
+  - [x] Define Apache commands (a2ensite, a2dissite, apachectl) - for enabling/disabling virtual hosts and reloading Apache
+  - [x] Define PHP-FPM commands (systemctl for php-fpm) - for managing PHP-FPM service and pools
+  - [x] Define database commands (mysql, mysqldump) - for database creation, user management, and backups
+  - [x] Define DNS commands (rndc, named-checkzone) - for Bind9 zone management and validation
+  - [x] Define mail commands (postmap, postfix) - for Postfix virtual mailbox configuration
+  - [x] Define certbot commands - for Let's Encrypt certificate requests and renewals
+  - [x] Define CSF firewall commands (csf, lfd) - csf -r (restart), csf -q (quick restart), csf -l (list), csf -td (temp deny), csf -ta (temp allow), csf -dr (deny remove), csf -t (temp list)
+  - [x] Define file operation commands (chown, chmod, mkdir, rm) - for file permission and directory management within allowed paths only
 
-- [ ] **Input Validator Service**
+- [x] **Input Validator Service**
   > Validates and sanitizes all user input before it reaches system commands. Prevents injection attacks, path traversal, and invalid data from corrupting the system.
-  - [ ] Create `src/core/validators/input-validator.service.ts` - centralized validation for all user inputs
-  - [ ] Implement username validation (Linux username rules) - lowercase letters, numbers, underscore, dash; 3-32 chars; must start with letter; no reserved names (root, admin, etc.)
-  - [ ] Implement domain name validation (RFC 1035) - valid hostname format, proper TLD, no special characters except dash; supports IDN via punycode
-  - [ ] Implement path validation (prevent traversal) - rejects paths containing '..', absolute paths outside allowed directories, symlink attacks
-  - [ ] Implement port validation - validates port is integer 1-65535, checks against reserved ports list, validates port is available
-  - [ ] Implement email validation - RFC 5322 compliant email format validation
-  - [ ] Create sanitize() method for all types - escapes special characters, trims whitespace, normalizes input for safe command usage
+  - [x] Create `src/core/validators/input-validator.service.ts` - centralized validation for all user inputs
+  - [x] Implement username validation (Linux username rules) - lowercase letters, numbers, underscore, dash; 3-32 chars; must start with letter; no reserved names (root, admin, etc.)
+  - [x] Implement domain name validation (RFC 1035) - valid hostname format, proper TLD, no special characters except dash; supports IDN via punycode
+  - [x] Implement path validation (prevent traversal) - rejects paths containing '..', absolute paths outside allowed directories, symlink attacks
+  - [x] Implement port validation - validates port is integer 1-65535, checks against reserved ports list, validates port is available
+  - [x] Implement email validation - RFC 5322 compliant email format validation
+  - [x] Create sanitize() method for all types - escapes special characters, trims whitespace, normalizes input for safe command usage
 
-- [ ] **Distribution Detector Service**
+- [x] **Distribution Detector Service**
   > Automatically detects the Linux distribution to use correct paths, package managers, and service names. Supports Ubuntu, Debian, Rocky Linux, AlmaLinux, and CentOS Stream.
-  - [ ] Create `src/core/distro/distro-detector.service.ts` - detects OS family and version at startup
-  - [ ] Implement /etc/os-release parsing - reads standard Linux distribution identification file for ID, VERSION_ID, NAME fields
-  - [ ] Detect Debian/Ubuntu family - identifies apt-based systems, maps to Debian path conventions
-  - [ ] Detect RHEL/Rocky/AlmaLinux family - identifies dnf-based systems, maps to RHEL path conventions
-  - [ ] Determine package manager (apt/dnf) - sets correct package install/remove commands for the detected OS
-  - [ ] Create fallback detection methods - uses /etc/debian_version, /etc/redhat-release as backups if os-release is missing
+  - [x] Create `src/core/distro/distro-detector.service.ts` - detects OS family and version at startup
+  - [x] Implement /etc/os-release parsing - reads standard Linux distribution identification file for ID, VERSION_ID, NAME fields
+  - [x] Detect Debian/Ubuntu family - identifies apt-based systems, maps to Debian path conventions
+  - [x] Detect RHEL/Rocky/AlmaLinux family - identifies dnf-based systems, maps to RHEL path conventions
+  - [x] Determine package manager (apt/dnf) - sets correct package install/remove commands for the detected OS
+  - [x] Create fallback detection methods - uses /etc/debian_version, /etc/redhat-release as backups if os-release is missing
 
-- [ ] **Path Resolver Service**
+- [x] **Path Resolver Service**
   > Maps service paths to the correct locations based on detected distribution. Apache is at /etc/apache2 on Debian but /etc/httpd on RHEL.
-  - [ ] Create `src/core/distro/path-resolver.service.ts` - provides correct file paths for each service per distribution
-  - [ ] Define Debian paths (Apache, PHP-FPM, Bind9, Postfix) - /etc/apache2, /etc/php, /etc/bind, /etc/postfix with Debian conventions
-  - [ ] Define RHEL paths (httpd, php-fpm, named, postfix) - /etc/httpd, /etc/php-fpm.d, /var/named, /etc/postfix with RHEL conventions
-  - [ ] Create getter methods for each service path set - apacheConfigPath(), apacheSitesAvailable(), phpFpmPoolPath(), bindZonePath(), etc.
+  - [x] Create `src/core/distro/path-resolver.service.ts` - provides correct file paths for each service per distribution
+  - [x] Define Debian paths (Apache, PHP-FPM, Bind9, Postfix) - /etc/apache2, /etc/php, /etc/bind, /etc/postfix with Debian conventions
+  - [x] Define RHEL paths (httpd, php-fpm, named, postfix) - /etc/httpd, /etc/php-fpm.d, /var/named, /etc/postfix with RHEL conventions
+  - [x] Create getter methods for each service path set - apacheConfigPath(), apacheSitesAvailable(), phpFpmPoolPath(), bindZonePath(), etc.
 
-- [ ] **Transaction Manager Service**
+- [x] **Transaction Manager Service**
   > Provides rollback capability for multi-step operations. If domain creation fails at step 5 of 7, all previous steps (user creation, directory creation, etc.) are automatically reverted.
-  - [ ] Create `src/core/rollback/transaction-manager.service.ts` - manages atomic multi-step operations with rollback support
-  - [ ] Implement startTransaction() method - begins a new transaction context, generates unique transaction ID for logging
-  - [ ] Implement addRollbackAction() method - registers a cleanup function to execute if transaction fails (e.g., delete user if vhost creation fails)
-  - [ ] Implement snapshotFile() method - creates backup copy of config files before modification, stores in /tmp with transaction ID
-  - [ ] Implement commit() method - marks transaction complete, clears rollback actions, deletes file snapshots
-  - [ ] Implement rollback() method with error handling - executes all rollback actions in reverse order, restores file snapshots, logs all recovery actions
-  - [ ] Create unit tests for transaction manager - tests nested transactions, partial failures, file restoration, and concurrent transactions
+  - [x] Create `src/core/rollback/transaction-manager.service.ts` - manages atomic multi-step operations with rollback support
+  - [x] Implement startTransaction() method - begins a new transaction context, generates unique transaction ID for logging
+  - [x] Implement addRollbackAction() method - registers a cleanup function to execute if transaction fails (e.g., delete user if vhost creation fails)
+  - [x] Implement snapshotFile() method - creates backup copy of config files before modification, stores in /tmp with transaction ID
+  - [x] Implement commit() method - marks transaction complete, clears rollback actions, deletes file snapshots
+  - [x] Implement rollback() method with error handling - executes all rollback actions in reverse order, restores file snapshots, logs all recovery actions
+  - [x] Create unit tests for transaction manager - tests nested transactions, partial failures, file restoration, and concurrent transactions
 
-- [ ] **Audit Logger Service**
+- [x] **Audit Logger Service**
   > Records all significant operations for security auditing and troubleshooting. Every domain creation, user deletion, or configuration change is logged with user context and timestamps.
-  - [ ] Create `src/core/audit/audit-logger.service.ts` - centralized audit logging for security and compliance
-  - [ ] Create AuditLog entity - stores operation type, user, IP address, target resource, old/new values, timestamp, success/failure status
-  - [ ] Implement logOperationStart() method - records operation initiation with parameters, useful for tracking long-running operations
-  - [ ] Implement logOperationComplete() method - records operation completion with result, duration, and any warnings
-  - [ ] Implement logSecurityEvent() method - special logging for security events: failed logins, permission denials, suspicious activities
-  - [ ] Add database indexes for efficient querying - indexes on userId, operationType, createdAt, resourceType for fast filtering and reporting
+  - [x] Create `src/core/audit/audit-logger.service.ts` - centralized audit logging for security and compliance
+  - [x] Create AuditLog entity - stores operation type, user, IP address, target resource, old/new values, timestamp, success/failure status
+  - [x] Implement logOperationStart() method - records operation initiation with parameters, useful for tracking long-running operations
+  - [x] Implement logOperationComplete() method - records operation completion with result, duration, and any warnings
+  - [x] Implement logSecurityEvent() method - special logging for security events: failed logins, permission denials, suspicious activities
+  - [x] Add database indexes for efficient querying - indexes on userId, operationType, createdAt, resourceType for fast filtering and reporting
 
 ### 1.3 Authentication Module
 
-- [ ] **User Entity**
+- [x] **User Entity**
   > Dashboard users (admins, resellers, domain owners) - NOT Linux system users. These are the accounts that log into the ServerHubX web interface.
-  - [ ] Create `src/modules/users/entities/user.entity.ts` - TypeORM entity for dashboard user accounts
-  - [ ] Define fields: email, password, firstName, lastName, role, isActive - core user identification and access control fields
-  - [ ] Add two-factor authentication fields - totpSecret (encrypted), totpEnabled, backupCodes array for 2FA support
-  - [ ] Add lastLoginAt field - tracks last successful login for security auditing and session management
-  - [ ] Add parentReseller relationship - for reseller model, links domain owners to their reseller account
-  - [ ] Create database migration - generates the users table with proper indexes on email (unique) and role
+  - [x] Create `src/modules/users/entities/user.entity.ts` - TypeORM entity for dashboard user accounts
+  - [x] Define fields: email, password, firstName, lastName, role, isActive - core user identification and access control fields
+  - [x] Add two-factor authentication fields - totpSecret (encrypted), totpEnabled, backupCodes array for 2FA support
+  - [x] Add lastLoginAt field - tracks last successful login for security auditing and session management
+  - [x] Add parentReseller relationship - for reseller model, links domain owners to their reseller account
+  - [x] Create database migration - generates the users table with proper indexes on email (unique) and role
 
-- [ ] **JWT Authentication**
+- [x] **JWT Authentication**
   > Stateless token-based authentication using short-lived access tokens and longer-lived refresh tokens. Access tokens are used for API requests, refresh tokens to obtain new access tokens.
-  - [ ] Install @nestjs/jwt and @nestjs/passport - JWT handling and Passport.js strategy integration for NestJS
-  - [ ] Create `jwt.config.ts` with secret and expiry settings - loads JWT_SECRET from env, sets access token TTL (15m), refresh token TTL (7d)
-  - [ ] Create JwtStrategy for token validation - Passport strategy that extracts and validates JWT from Authorization header
-  - [ ] Create LocalStrategy for email/password login - Passport strategy for initial authentication before issuing tokens
-  - [ ] Implement access token generation (15 min expiry) - short-lived token containing userId, email, role; used for all authenticated API requests
-  - [ ] Implement refresh token generation (7 day expiry) - longer-lived token stored in httpOnly cookie, used only to obtain new access tokens
+  - [x] Install @nestjs/jwt and @nestjs/passport - JWT handling and Passport.js strategy integration for NestJS
+  - [x] Create `jwt.config.ts` with secret and expiry settings - loads JWT_SECRET from env, sets access token TTL (15m), refresh token TTL (7d)
+  - [x] Create JwtStrategy for token validation - Passport strategy that extracts and validates JWT from Authorization header
+  - [x] Create LocalStrategy for email/password login - Passport strategy for initial authentication before issuing tokens
+  - [x] Implement access token generation (15 min expiry) - short-lived token containing userId, email, role; used for all authenticated API requests
+  - [x] Implement refresh token generation (7 day expiry) - longer-lived token stored in httpOnly cookie, used only to obtain new access tokens
 
-- [ ] **Auth Service**
+- [x] **Auth Service**
   > Core authentication logic including password verification, token generation/validation, and session management.
-  - [ ] Create `src/modules/auth/auth.service.ts` - handles all authentication operations
-  - [ ] Implement login() with password verification - validates credentials, checks account status, logs login attempt, returns tokens
-  - [ ] Implement logout() with token invalidation - adds refresh token to Redis blacklist until expiry, clears client cookies
-  - [ ] Implement refreshToken() method - validates refresh token, checks blacklist, issues new access token if valid
-  - [ ] Implement validateUser() method - used by LocalStrategy to verify email/password combination
-  - [ ] Add argon2 password hashing - uses argon2id algorithm (winner of Password Hashing Competition), memory-hard to resist GPU attacks
+  - [x] Create `src/modules/auth/auth.service.ts` - handles all authentication operations
+  - [x] Implement login() with password verification - validates credentials, checks account status, logs login attempt, returns tokens
+  - [x] Implement logout() with token invalidation - adds refresh token to Redis blacklist until expiry, clears client cookies
+  - [x] Implement refreshToken() method - validates refresh token, checks blacklist, issues new access token if valid
+  - [x] Implement validateUser() method - used by LocalStrategy to verify email/password combination
+  - [x] Add argon2 password hashing - uses argon2id algorithm (winner of Password Hashing Competition), memory-hard to resist GPU attacks
 
-- [ ] **Auth Controller**
+- [x] **Auth Controller**
   > REST endpoints for authentication operations. All auth endpoints have rate limiting to prevent brute force attacks.
-  - [ ] Create `src/modules/auth/auth.controller.ts` - authentication REST endpoints
-  - [ ] POST /auth/login endpoint - accepts email/password, returns access token in body and refresh token in httpOnly cookie
-  - [ ] POST /auth/logout endpoint - invalidates refresh token, clears cookies, logs logout event
-  - [ ] POST /auth/refresh endpoint - exchanges valid refresh token for new access token
-  - [ ] POST /auth/forgot-password endpoint - generates password reset token, sends email with reset link (valid 1 hour)
-  - [ ] POST /auth/reset-password endpoint - validates reset token, updates password, invalidates all existing sessions
+  - [x] Create `src/modules/auth/auth.controller.ts` - authentication REST endpoints
+  - [x] POST /auth/login endpoint - accepts email/password, returns access token in body and refresh token in httpOnly cookie
+  - [x] POST /auth/logout endpoint - invalidates refresh token, clears cookies, logs logout event
+  - [x] POST /auth/refresh endpoint - exchanges valid refresh token for new access token
+  - [x] POST /auth/forgot-password endpoint - generates password reset token, sends email with reset link (valid 1 hour)
+  - [x] POST /auth/reset-password endpoint - validates reset token, updates password, invalidates all existing sessions
 
-- [ ] **Auth Guards**
+- [x] **Auth Guards**
   > NestJS guards that protect routes by validating authentication tokens and enforcing access control.
-  - [ ] Create JwtAuthGuard - protects routes requiring authentication, extracts user from valid JWT, attaches to request
-  - [ ] Create LocalAuthGuard - used only on login endpoint to validate email/password credentials
-  - [ ] Create RefreshTokenGuard - validates refresh token from httpOnly cookie for token refresh endpoint
+  - [x] Create JwtAuthGuard - protects routes requiring authentication, extracts user from valid JWT, attaches to request
+  - [x] Create LocalAuthGuard - used only on login endpoint to validate email/password credentials
+  - [x] Create RefreshTokenGuard - validates refresh token from httpOnly cookie for token refresh endpoint
 
 ### 1.4 Authorization System
 
-- [ ] **CASL Integration**
+- [x] **CASL Integration**
   > CASL (Isomorphic Authorization) provides attribute-based access control. Defines what actions each role can perform on which resources, with support for field-level permissions.
-  - [ ] Install @casl/ability - isomorphic authorization library that works on both backend and can be shared with frontend
-  - [ ] Create `src/authorization/casl-ability.factory.ts` - factory that builds ability rules based on user role and ownership
-  - [ ] Define actions: manage, create, read, update, delete - standard CRUD actions plus 'manage' which grants all actions
-  - [ ] Define subjects: Domain, App, Database, User, etc. - entity classes that can be protected by authorization rules
+  - [x] Install @casl/ability - isomorphic authorization library that works on both backend and can be shared with frontend
+  - [x] Create `src/authorization/casl-ability.factory.ts` - factory that builds ability rules based on user role and ownership
+  - [x] Define actions: manage, create, read, update, delete - standard CRUD actions plus 'manage' which grants all actions
+  - [x] Define subjects: Domain, App, Database, User, etc. - entity classes that can be protected by authorization rules
 
-- [ ] **Role Definitions**
+- [x] **Role Definitions**
   > Four-tier role hierarchy from full system access down to limited developer access. Each role inherits nothing from others - permissions are explicitly defined.
-  - [ ] Define ROOT_ADMIN permissions (full access) - can manage all resources, access system settings, view all domains, manage all users
-  - [ ] Define RESELLER permissions (manage own clients) - can create domain owners under their account, manage those users' domains, set resource limits
-  - [ ] Define DOMAIN_OWNER permissions (manage own resources) - can manage their own domains, apps, databases, email; cannot access other users' resources
-  - [ ] Define DEVELOPER permissions (limited access) - read-only access to assigned domains, can use terminal and file manager, cannot modify domain settings
+  - [x] Define ROOT_ADMIN permissions (full access) - can manage all resources, access system settings, view all domains, manage all users
+  - [x] Define RESELLER permissions (manage own clients) - can create domain owners under their account, manage those users' domains, set resource limits
+  - [x] Define DOMAIN_OWNER permissions (manage own resources) - can manage their own domains, apps, databases, email; cannot access other users' resources
+  - [x] Define DEVELOPER permissions (limited access) - read-only access to assigned domains, can use terminal and file manager, cannot modify domain settings
 
-- [ ] **Policy Guards**
+- [x] **Policy Guards**
   > Guards that enforce CASL policies on controller routes. Applied via decorators, they check if the current user has permission for the requested action on the target resource.
-  - [ ] Create `src/authorization/guards/policies.guard.ts` - NestJS guard that evaluates CASL abilities against requested action/resource
-  - [ ] Create @CheckPolicies() decorator - route decorator that specifies required ability, e.g., @CheckPolicies((ability) => ability.can('update', Domain))
-  - [ ] Implement policy handler execution - resolves the target resource (e.g., fetches domain by ID), checks user's ability against it
-  - [ ] Add to global guards - registers PoliciesGuard globally but only activates on routes with @CheckPolicies() decorator
+  - [x] Create `src/authorization/guards/policies.guard.ts` - NestJS guard that evaluates CASL abilities against requested action/resource
+  - [x] Create @CheckPolicies() decorator - route decorator that specifies required ability, e.g., @CheckPolicies((ability) => ability.can('update', Domain))
+  - [x] Implement policy handler execution - resolves the target resource (e.g., fetches domain by ID), checks user's ability against it
+  - [x] Add to global guards - registers PoliciesGuard globally but only activates on routes with @CheckPolicies() decorator
 
 ### 1.5 Frontend Setup
 
-- [ ] **Initialize React Project**
-  - [ ] Create Vite project with React + TypeScript
-  - [ ] Configure TypeScript strict mode
-  - [ ] Set up path aliases in vite.config.ts
-  - [ ] Install ESLint and Prettier
-  - [ ] Configure Husky for pre-commit hooks
+- [x] **Initialize React Project**
+  - [x] Create Vite project with React + TypeScript
+  - [x] Configure TypeScript strict mode
+  - [x] Set up path aliases in vite.config.ts
+  - [x] Install ESLint and Prettier
+  - [x] Configure Husky for pre-commit hooks
 
-- [ ] **Configure Tailwind CSS**
-  - [ ] Install Tailwind CSS and PostCSS
-  - [ ] Create tailwind.config.ts with custom theme
-  - [ ] Define CSS variables for light/dark themes
-  - [ ] Create globals.css with base styles
-  - [ ] Set up @tailwindcss/forms and @tailwindcss/typography
+- [x] **Configure Tailwind CSS**
+  - [x] Install Tailwind CSS and PostCSS
+  - [x] Create tailwind.config.ts with custom theme
+  - [x] Define CSS variables for light/dark themes
+  - [x] Create globals.css with base styles
+  - [x] Set up @tailwindcss/forms and @tailwindcss/typography
 
-- [ ] **Create Folder Structure**
-  - [ ] Create src/components/ui/ directory
-  - [ ] Create src/components/common/ directory
-  - [ ] Create src/features/ directory
-  - [ ] Create src/hooks/ directory
-  - [ ] Create src/lib/ directory
-  - [ ] Create src/store/ directory
-  - [ ] Create src/services/ directory
-  - [ ] Create src/types/ directory
-  - [ ] Create src/layouts/ directory
-  - [ ] Create src/pages/ directory
+- [x] **Create Folder Structure**
+  - [x] Create src/components/ui/ directory
+  - [x] Create src/components/common/ directory
+  - [x] Create src/features/ directory
+  - [x] Create src/hooks/ directory
+  - [x] Create src/lib/ directory
+  - [x] Create src/store/ directory
+  - [x] Create src/services/ directory
+  - [x] Create src/types/ directory
+  - [x] Create src/layouts/ directory
+  - [x] Create src/pages/ directory
 
-- [ ] **Core UI Components**
-  - [ ] Create Button component with variants (primary, secondary, danger, ghost)
-  - [ ] Create Input component with validation states
-  - [ ] Create Select component with search
-  - [ ] Create Checkbox component
-  - [ ] Create Switch component
-  - [ ] Create Modal component with portal
-  - [ ] Create Toast/Notification component
-  - [ ] Create Spinner component
-  - [ ] Create Skeleton component
-  - [ ] Create Badge component
+- [x] **Core UI Components**
+  - [x] Create Button component with variants (primary, secondary, danger, ghost)
+  - [x] Create Input component with validation states
+  - [x] Create Select component with search
+  - [x] Create Checkbox component
+  - [x] Create Switch component
+  - [x] Create Modal component with portal
+  - [x] Create Toast/Notification component
+  - [x] Create Spinner component
+  - [x] Create Skeleton component
+  - [x] Create Badge component
 
-- [ ] **State Management (Zustand)**
-  - [ ] Install zustand
-  - [ ] Create auth slice (user, token, login, logout)
-  - [ ] Create theme slice (mode, setTheme)
-  - [ ] Create sidebar slice (collapsed, activeItem)
-  - [ ] Create notification slice (items, add, remove)
-  - [ ] Configure persist middleware for auth
+- [x] **State Management (Zustand)**
+  - [x] Install zustand
+  - [x] Create auth slice (user, token, login, logout)
+  - [x] Create theme slice (mode, setTheme)
+  - [x] Create sidebar slice (collapsed, activeItem)
+  - [x] Create notification slice (items, add, remove)
+  - [x] Configure persist middleware for auth
 
-- [ ] **React Query Setup**
-  - [ ] Install @tanstack/react-query
-  - [ ] Create QueryClient with default options
-  - [ ] Create QueryProvider component
-  - [ ] Configure stale time and cache time
+- [x] **React Query Setup**
+  - [x] Install @tanstack/react-query
+  - [x] Create QueryClient with default options
+  - [x] Create QueryProvider component
+  - [x] Configure stale time and cache time
 
-- [ ] **API Client**
-  - [ ] Create `src/lib/api/client.ts` with Axios
-  - [ ] Add request interceptor for auth token
-  - [ ] Add response interceptor for 401 handling
-  - [ ] Add token refresh logic
-  - [ ] Create typed API error handling
+- [x] **API Client**
+  - [x] Create `src/lib/api/client.ts` with Axios
+  - [x] Add request interceptor for auth token
+  - [x] Add response interceptor for 401 handling
+  - [x] Add token refresh logic
+  - [x] Create typed API error handling
 
-- [ ] **Authentication Flow**
-  - [ ] Create AuthProvider component
-  - [ ] Create useAuth hook
-  - [ ] Create ProtectedRoute component
-  - [ ] Create RoleGuard component
-  - [ ] Create LoginPage
-  - [ ] Create login form with validation
+- [x] **Authentication Flow**
+  - [x] Create AuthProvider component
+  - [x] Create useAuth hook
+  - [x] Create ProtectedRoute component
+  - [x] Create RoleGuard component
+  - [x] Create LoginPage
+  - [x] Create login form with validation
 
-- [ ] **Layout Components**
-  - [ ] Create MainLayout with sidebar and header
-  - [ ] Create Sidebar component with navigation
-  - [ ] Create Header component with user menu
-  - [ ] Create AuthLayout for login pages
-  - [ ] Set up React Router with layouts
+- [x] **Layout Components**
+  - [x] Create MainLayout with sidebar and header
+  - [x] Create Sidebar component with navigation
+  - [x] Create Header component with user menu
+  - [x] Create AuthLayout for login pages
+  - [x] Set up React Router with layouts
 
 ---
 
@@ -1066,18 +1066,18 @@ Both should return your server's IP address.
   - [x] Implement acknowledgeAlert() method
   - [x] Implement resolveAlert() method
 
-- [ ] **Default Alert Rules** (Skipped - can be added via UI)
-  - [ ] Create seed for default rules:
-    - [ ] High CPU Usage (>90% for 5 min)
-    - [ ] High Memory Usage (>85% for 5 min)
-    - [ ] Disk Almost Full (>90%)
-    - [ ] Disk Warning (>80%)
-    - [ ] Service Down
-    - [ ] App Crashed
-    - [ ] SSL Expiring (<14 days)
-    - [ ] SSL Expired (<1 day)
-    - [ ] Database Slow Queries
-    - [ ] Mail Queue Backup
+- [x] **Default Alert Rules**
+  - [x] Create seed for default rules:
+    - [x] High CPU Usage (>90% for 5 min)
+    - [x] High Memory Usage (>85% for 5 min)
+    - [x] Disk Almost Full (>90%)
+    - [x] Disk Warning (>80%)
+    - [x] Service Down
+    - [x] App Crashed
+    - [x] SSL Expiring (<14 days)
+    - [x] SSL Expired (<1 day)
+    - [x] Database Slow Queries
+    - [x] Mail Queue Backup
 
 - [x] **Monitoring WebSocket Gateway**
   - [x] Create `src/modules/monitoring/monitoring.gateway.ts`
@@ -1125,18 +1125,18 @@ Both should return your server's IP address.
   - [x] Implement send() method
   - [x] Format message for SMS length limit
 
-- [ ] **FCM Notification Provider (Firebase)** (Skipped - optional channel)
-  - [ ] Create `src/modules/notifications/providers/fcm.provider.ts`
-  - [ ] Install firebase-admin
-  - [ ] Implement send() method
-  - [ ] Configure Android/iOS notification options
-  - [ ] Include alert data payload
+- [x] **FCM Notification Provider (Firebase)**
+  - [x] Create `src/modules/notifications/providers/fcm.provider.ts`
+  - [x] Install firebase-admin
+  - [x] Implement send() method
+  - [x] Configure Android/iOS notification options
+  - [x] Include alert data payload
 
-- [ ] **WhatsApp Notification Provider** (Skipped - optional channel)
-  - [ ] Create `src/modules/notifications/providers/whatsapp.provider.ts`
-  - [ ] Implement Meta Business API integration
-  - [ ] Create WhatsApp message templates
-  - [ ] Implement send() method
+- [x] **WhatsApp Notification Provider**
+  - [x] Create `src/modules/notifications/providers/whatsapp.provider.ts`
+  - [x] Implement Meta Business API integration
+  - [x] Create WhatsApp message templates
+  - [x] Implement send() method
 
 - [x] **Webhook Notification Provider**
   - [x] Create `src/modules/notifications/providers/webhook.provider.ts`
@@ -1207,20 +1207,20 @@ Both should return your server's IP address.
   - [x] Create AlertRuleForm component
   - [x] Implement useMonitoring hook with WebSocket
 
-- [ ] **Log Viewer UI** (Skipped - can be added later)
-  - [ ] Create LogsPage component
-  - [ ] Create LogViewer component
-  - [ ] Create LogFilter component
-  - [ ] Create LiveTail component
-  - [ ] Create LogSearch component
-  - [ ] Implement useLiveLogs hook
+- [x] **Log Viewer UI**
+  - [x] Create LogsPage component
+  - [x] Create LogViewer component
+  - [x] Create LogFilter component
+  - [x] Create LiveTail component
+  - [x] Create LogSearch component
+  - [x] Implement useLiveLogs hook
 
 - [x] **Notification Settings UI**
   - [x] Create NotificationSettings component
   - [x] Create EmailNotificationForm component
   - [x] Create SMSNotificationForm component
-  - [ ] Create FCMNotificationForm component (optional)
-  - [ ] Create WhatsAppNotificationForm component (optional)
+  - [x] Create FCMNotificationForm component
+  - [x] Create WhatsAppNotificationForm component
   - [x] Create WebhookNotificationForm component
   - [x] Create QuietHoursForm component
   - [x] Create TestNotificationButton component
@@ -1358,65 +1358,65 @@ Both should return your server's IP address.
 
 ### 8.3 Security Hardening
 
-- [ ] **Rate Limiting**
-  - [ ] Install @nestjs/throttler
-  - [ ] Configure global rate limits
-  - [ ] Add stricter limits for auth endpoints
-  - [ ] Add per-user rate limiting
+- [x] **Rate Limiting**
+  - [x] Install @nestjs/throttler
+  - [x] Configure global rate limits
+  - [x] Add stricter limits for auth endpoints
+  - [x] Add per-user rate limiting
 
-- [ ] **Security Headers**
-  - [ ] Install helmet
-  - [ ] Configure CORS properly
-  - [ ] Add Content Security Policy
-  - [ ] Add X-Frame-Options
-  - [ ] Add X-Content-Type-Options
+- [x] **Security Headers**
+  - [x] Install helmet
+  - [x] Configure CORS properly
+  - [x] Add Content Security Policy
+  - [x] Add X-Frame-Options
+  - [x] Add X-Content-Type-Options
 
-- [ ] **Input Validation Audit**
-  - [ ] Review all DTOs for proper validation
-  - [ ] Add sanitization to all inputs
-  - [ ] Test for SQL injection
-  - [ ] Test for XSS
-  - [ ] Test for command injection
+- [x] **Input Validation Audit**
+  - [x] Review all DTOs for proper validation
+  - [x] Add sanitization to all inputs
+  - [x] Test for SQL injection
+  - [x] Test for XSS
+  - [x] Test for command injection
 
-- [ ] **CSRF Protection**
-  - [ ] Implement CSRF tokens for state-changing operations
-  - [ ] Add CSRF validation middleware
+- [x] **CSRF Protection**
+  - [x] Implement CSRF tokens for state-changing operations
+  - [x] Add CSRF validation middleware
 
 ### 8.4 Frontend Polish
 
-- [ ] **Theme System**
-  - [ ] Implement dark/light theme toggle
-  - [ ] Persist theme preference
-  - [ ] System preference detection
-  - [ ] Smooth theme transition
+- [x] **Theme System**
+  - [x] Implement dark/light theme toggle
+  - [x] Persist theme preference
+  - [x] System preference detection
+  - [x] Smooth theme transition
 
-- [ ] **Keyboard Shortcuts**
-  - [ ] Create useKeyboardShortcuts hook
-  - [ ] Implement global shortcuts (/, Ctrl+K for search)
-  - [ ] Implement page-specific shortcuts
-  - [ ] Create KeyboardShortcutsHelp modal
+- [x] **Keyboard Shortcuts**
+  - [x] Create useKeyboardShortcuts hook
+  - [x] Implement global shortcuts (/, Ctrl+K for search)
+  - [x] Implement page-specific shortcuts
+  - [x] Create KeyboardShortcutsHelp modal
 
-- [ ] **Responsive Design**
-  - [ ] Test and fix mobile layouts
-  - [ ] Collapsible sidebar on mobile
-  - [ ] Touch-friendly interactions
-  - [ ] Mobile-optimized tables
+- [x] **Responsive Design**
+  - [x] Test and fix mobile layouts
+  - [x] Collapsible sidebar on mobile
+  - [x] Touch-friendly interactions
+  - [x] Mobile-optimized tables
 
-- [ ] **Empty States**
-  - [ ] Create EmptyState component
-  - [ ] Add empty states to all lists
-  - [ ] Include helpful actions
+- [x] **Empty States**
+  - [x] Create EmptyState component
+  - [x] Add empty states to all lists
+  - [x] Include helpful actions
 
-- [ ] **Error Handling**
-  - [ ] Create ErrorBoundary component
-  - [ ] Create error pages (404, 403, 500)
-  - [ ] Add toast notifications for errors
-  - [ ] Implement retry logic
+- [x] **Error Handling**
+  - [x] Create ErrorBoundary component
+  - [x] Create error pages (404, 403, 500)
+  - [x] Add toast notifications for errors
+  - [x] Implement retry logic
 
-- [ ] **Loading States**
-  - [ ] Create consistent loading spinners
-  - [ ] Add skeleton loaders to pages
-  - [ ] Add loading overlay for actions
+- [x] **Loading States**
+  - [x] Create consistent loading spinners
+  - [x] Add skeleton loaders to pages
+  - [x] Add loading overlay for actions
 
 - [x] **System Info Page**
   - [x] Create SystemInfoPage component
@@ -1437,11 +1437,11 @@ Both should return your server's IP address.
   - [x] Create AddIpModal component (supports allow/block/temp-block)
   - [x] Implement useFirewall hooks with React Query
 
-- [ ] **SSH Security Management UI** (Deferred to Phase 9)
-  - [ ] Create SSHSecurityPage component
-  - [ ] Create SSHPortConfig component
-  - [ ] Create SSHSecuritySettings component
-  - [ ] Implement useSSH hooks
+- [x] **SSH Security Management UI**
+  - [x] Create SSHSecurityPage component
+  - [x] Create SSHPortConfig component
+  - [x] Create SSHSecuritySettings component
+  - [x] Implement useSSH hooks
 
 ---
 
