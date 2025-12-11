@@ -176,4 +176,17 @@ export class PathResolverService {
   getSshAuthorizedKeysPath(username: string): string {
     return `/home/${username}/.ssh/authorized_keys`;
   }
+
+  getSslCertDir(domain: string): string {
+    return `/etc/ssl/serverhubx/${domain}`;
+  }
+
+  getApacheSslSitePath(domain: string): string {
+    const paths = this.getApachePaths();
+    return `${paths.sitesAvailable}/${domain}-ssl.conf`;
+  }
+
+  getLetsEncryptCertDir(domain: string): string {
+    return `/etc/letsencrypt/live/${domain}`;
+  }
 }

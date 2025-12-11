@@ -22,6 +22,8 @@ import { DomainsModule } from './modules/domains/domains.module.js';
 import { AppsModule } from './modules/apps/apps.module.js';
 import { DatabasesModule } from './modules/databases/databases.module.js';
 import { DnsModule } from './modules/dns/dns.module.js';
+import { SslModule } from './modules/ssl/ssl.module.js';
+import { MailModule } from './modules/mail/mail.module.js';
 
 @Module({
   imports: [
@@ -71,6 +73,8 @@ import { DnsModule } from './modules/dns/dns.module.js';
     AppsModule,
     DatabasesModule,
     DnsModule,
+    SslModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [

@@ -5,3 +5,5 @@ export * from './users';
 export * from './apps';
 export * from './databases';
 export * from './dns';
+export * from './ssl';
+export * from './mail';

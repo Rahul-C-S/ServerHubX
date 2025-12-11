@@ -139,6 +139,8 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^[a-z][a-z0-9_-]{0,31}:[a-z][a-z0-9_-]{0,31}$/, // user:group
       /^[a-z][a-z0-9_-]{0,31}$/, // user only
       /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)*$/, // Home directory paths
+      /^\/var\/mail\/vhosts\/[a-z0-9][a-z0-9.-]{0,253}(\/[a-zA-Z0-9._-]+)*$/, // Mail directories
+      /^\/etc\/ssl\/serverhubx\/[a-z0-9][a-z0-9.-]{0,253}(\/[a-zA-Z0-9._-]+)*$/, // SSL cert directories
     ],
   },
   chmod: {
@@ -149,6 +151,8 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^-R$/, // Recursive
       /^[0-7]{3,4}$/, // Octal permissions
       /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)*$/, // Home directory paths
+      /^\/etc\/dovecot\/(users|passwd)$/, // Dovecot auth files
+      /^\/etc\/ssl\/serverhubx\/[a-z0-9][a-z0-9.-]{0,253}(\/[a-zA-Z0-9._-]+)*$/, // SSL cert files
     ],
   },
   mkdir: {
@@ -162,6 +166,8 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)*$/, // Home directory paths
       /^\/etc\/(apache2|httpd)\/sites-available\/[a-z0-9][a-z0-9.-]{0,253}\.conf$/, // Apache sites
       /^\/var\/log\/[a-z][a-z0-9_-]{0,31}$/, // Log directories
+      /^\/var\/mail\/vhosts\/[a-z0-9][a-z0-9.-]{0,253}(\/[a-zA-Z0-9._-]+)*$/, // Mail directories
+      /^\/etc\/ssl\/serverhubx\/[a-z0-9][a-z0-9.-]{0,253}$/, // SSL cert directories
     ],
   },
   rm: {
@@ -174,9 +180,11 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^-rf$/, // Combined
       /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)+$/, // Home directory paths (not root)
       /^\/etc\/(apache2|httpd)\/sites-(available|enabled)\/[a-z0-9][a-z0-9.-]{0,253}\.conf$/,
+      /^\/etc\/(apache2|httpd)\/sites-(available|enabled)\/[a-z0-9][a-z0-9.-]{0,253}-ssl\.conf$/,
       /^\/etc\/php\/[0-9.]+\/fpm\/pool\.d\/[a-z][a-z0-9_-]{0,31}\.conf$/,
       /^\/var\/named\/[a-z0-9][a-z0-9.-]{0,253}\.zone$/, // DNS zone files
       /^\/etc\/bind\/zones\/[a-z0-9][a-z0-9.-]{0,253}\.zone$/,
+      /^\/var\/mail\/vhosts\/[a-z0-9][a-z0-9.-]{0,253}(\/[a-zA-Z0-9._-]+)*$/, // Mail directories
     ],
   },
   cp: {
@@ -294,6 +302,24 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^check$/,
     ],
   },
+  doveadm: {
+    command: 'doveadm',
+    description: 'Dovecot administration',
+    requiresSudo: true,
+    allowedArgumentPatterns: [
+      /^reload$/,
+      /^stop$/,
+      /^pw$/,
+      /^-s$/,
+      /^BLF-CRYPT$/,
+      /^SHA512-CRYPT$/,
+      /^quota$/,
+      /^get$/,
+      /^recalc$/,
+      /^-u$/,
+      /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/, // Email
+    ],
+  },
 
   // SSL/Certbot commands
   certbot: {
@@ -305,10 +331,21 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^renew$/,
       /^revoke$/,
       /^delete$/,
+      /^certificates$/,
       /^--webroot$/,
       /^--standalone$/,
       /^--apache$/,
       /^--nginx$/,
+      /^--manual$/,
+      /^--preferred-challenges$/,
+      /^dns$/,
+      /^http$/,
+      /^--manual-auth-hook$/,
+      /^\/bin\/true$/,
+      /^--dry-run$/,
+      /^--force-renewal$/,
+      /^--cert-name$/,
+      /^--cert-path$/,
       /^-w$/,
       /^--webroot-path$/,
       /^-d$/,
@@ -318,8 +355,34 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^-n$/,
       /^--email$/,
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, // Email
-      /^[a-z0-9][a-z0-9.-]{0,253}$/, // Domain
+      /^[a-z0-9*][a-z0-9.*-]{0,253}$/, // Domain (including wildcards)
       /^\/home\/[a-z][a-z0-9_-]{0,31}\/public_html$/, // Webroot
+      /^\/var\/www\/html$/,
+      /^\/etc\/letsencrypt\/live\/[a-z0-9][a-z0-9.-]{0,253}\/cert\.pem$/,
+    ],
+  },
+  openssl: {
+    command: 'openssl',
+    description: 'OpenSSL cryptography toolkit',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^x509$/,
+      /^rsa$/,
+      /^req$/,
+      /^-in$/,
+      /^-noout$/,
+      /^-subject$/,
+      /^-dates$/,
+      /^-issuer$/,
+      /^-serial$/,
+      /^-ext$/,
+      /^-modulus$/,
+      /^subjectAltName$/,
+      /^\/tmp\/cert-[0-9]+\.pem$/,
+      /^\/tmp\/key-[0-9]+\.pem$/,
+      /^\/tmp\/cert-validate-[0-9]+\.pem$/,
+      /^\/tmp\/key-validate-[0-9]+\.pem$/,
+      /^\/etc\/letsencrypt\/live\/[a-z0-9][a-z0-9.-]{0,253}\/.*\.pem$/,
     ],
   },
 
@@ -623,10 +686,18 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^-a$/, // Append
       /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)+$/,
       /^\/etc\/(apache2|httpd)\/sites-available\/[a-z0-9][a-z0-9.-]{0,253}\.conf$/,
+      /^\/etc\/(apache2|httpd)\/sites-available\/[a-z0-9][a-z0-9.-]{0,253}-ssl\.conf$/,
       /^\/etc\/php\/[0-9.]+\/fpm\/pool\.d\/[a-z][a-z0-9_-]{0,31}\.conf$/,
       /^\/etc\/php-fpm\.d\/[a-z][a-z0-9_-]{0,31}\.conf$/,
       /^\/etc\/bind\/zones\/[a-z0-9][a-z0-9.-]{0,253}\.zone$/,
       /^\/var\/named\/[a-z0-9][a-z0-9.-]{0,253}\.zone$/,
+      /^\/etc\/postfix\/virtual_domains$/,
+      /^\/etc\/postfix\/virtual_mailboxes$/,
+      /^\/etc\/postfix\/virtual_aliases$/,
+      /^\/etc\/postfix\/sender_login_maps$/,
+      /^\/etc\/dovecot\/users$/,
+      /^\/etc\/dovecot\/passwd$/,
+      /^\/etc\/ssl\/serverhubx\/[a-z0-9][a-z0-9.-]{0,253}\/.*\.pem$/,
     ],
   },
 };

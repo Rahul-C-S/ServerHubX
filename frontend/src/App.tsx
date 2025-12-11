@@ -19,6 +19,8 @@ import {
   DatabaseDetailPage,
   DnsPage,
   DnsZoneDetailPage,
+  MailPage,
+  MailDomainDetailPage,
 } from '@/pages';
 
 function AppContent() {
@@ -58,8 +60,8 @@ function AppContent() {
         <Route path="/databases/:id" element={<DatabaseDetailPage />} />
         <Route path="/dns" element={<DnsPage />} />
         <Route path="/dns/:id" element={<DnsZoneDetailPage />} />
-        <Route path="/email" element={<PlaceholderPage title="Email" />} />
-        <Route path="/ssl" element={<PlaceholderPage title="SSL Certificates" />} />
+        <Route path="/mail" element={<MailPage />} />
+        <Route path="/mail/:id" element={<MailDomainDetailPage />} />
         <Route path="/backups" element={<PlaceholderPage title="Backups" />} />
         <Route path="/terminal" element={<PlaceholderPage title="Terminal" />} />
         <Route path="/users" element={<UsersPage />} />

@@ -3,6 +3,8 @@ export * from './domain';
 export * from './app';
 export * from './database';
 export * from './dns';
+export * from './ssl';
+export * from './mail';
 
 export interface ApiError {
   message: string;
