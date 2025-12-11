@@ -17,9 +17,11 @@ import { UsersModule } from './modules/users/users.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { AuthorizationModule } from './modules/authorization/authorization.module.js';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard.js';
-import { SystemUsersModule } from './modules/system-users/system-users.module';
-import { DomainsModule } from './modules/domains/domains.module';
-import { AppsModule } from './modules/apps/apps.module';
+import { SystemUsersModule } from './modules/system-users/system-users.module.js';
+import { DomainsModule } from './modules/domains/domains.module.js';
+import { AppsModule } from './modules/apps/apps.module.js';
+import { DatabasesModule } from './modules/databases/databases.module.js';
+import { DnsModule } from './modules/dns/dns.module.js';
 
 @Module({
   imports: [
@@ -67,6 +69,8 @@ import { AppsModule } from './modules/apps/apps.module';
     SystemUsersModule,
     DomainsModule,
     AppsModule,
+    DatabasesModule,
+    DnsModule,
   ],
   controllers: [AppController],
   providers: [

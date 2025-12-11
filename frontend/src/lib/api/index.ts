@@ -3,3 +3,5 @@ export * from './auth';
 export * from './domains';
 export * from './system-users';
 export * from './apps';
+export * from './databases';
+export * from './dns';

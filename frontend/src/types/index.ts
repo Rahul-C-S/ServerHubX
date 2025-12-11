@@ -1,6 +1,8 @@
 export * from './auth';
 export * from './domain';
 export * from './app';
+export * from './database';
+export * from './dns';
 
 export interface ApiError {
   message: string;

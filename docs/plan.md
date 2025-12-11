@@ -599,119 +599,125 @@ Both should return your server's IP address.
 
 ---
 
-## Phase 4: Databases & DNS (Week 7-8)
+## Phase 4: Databases & DNS (Week 7-8) ✅ COMPLETED
 
 ### 4.1 Database Management
 
-- [ ] **Database Entity**
-  - [ ] Create `src/modules/databases/entities/database.entity.ts`
-  - [ ] Define fields: name, type, sizeBytes, charset, collation
-  - [ ] Add owner relationship
-  - [ ] Add domain relationship (optional)
-  - [ ] Create database migration
+- [x] **Database Entity**
+  - [x] Create `src/modules/databases/entities/database.entity.ts`
+  - [x] Define fields: name, type, sizeBytes, charset, collation
+  - [x] Add owner relationship
+  - [x] Add domain relationship (optional)
+  - [x] Create database migration
 
-- [ ] **Database User Entity**
-  - [ ] Create database-user.entity.ts
-  - [ ] Define fields: username, passwordHash, privileges, host
-  - [ ] Add database relationship
-  - [ ] Create database migration
+- [x] **Database User Entity**
+  - [x] Create database-user.entity.ts
+  - [x] Define fields: username, passwordHash, privileges, host
+  - [x] Add database relationship
+  - [x] Create database migration
 
-- [ ] **MariaDB Service**
-  - [ ] Create `src/modules/databases/mariadb.service.ts`
-  - [ ] Implement createDatabase() method
-  - [ ] Implement dropDatabase() method
-  - [ ] Implement getDatabaseSize() method
-  - [ ] Implement createUser() method
-  - [ ] Implement dropUser() method
-  - [ ] Implement grantPrivileges() method
-  - [ ] Implement revokePrivileges() method
-  - [ ] Implement resetPassword() method
+- [x] **MariaDB Service**
+  - [x] Create `src/modules/databases/services/mariadb.service.ts`
+  - [x] Implement createDatabase() method
+  - [x] Implement dropDatabase() method
+  - [x] Implement getDatabaseSize() method
+  - [x] Implement createUser() method
+  - [x] Implement dropUser() method
+  - [x] Implement grantPrivileges() method
+  - [x] Implement revokePrivileges() method
+  - [x] Implement resetPassword() method
 
-- [ ] **Databases Service**
-  - [ ] Create `src/modules/databases/databases.service.ts`
-  - [ ] Implement create() with user creation
-  - [ ] Implement delete() with cleanup
-  - [ ] Implement backup() using mysqldump
-  - [ ] Implement restore() method
-  - [ ] Implement import() method
-  - [ ] Implement export() method
+- [x] **Databases Service**
+  - [x] Create `src/modules/databases/databases.service.ts`
+  - [x] Implement create() with user creation
+  - [x] Implement delete() with cleanup
+  - [x] Implement backup() using mysqldump
+  - [x] Implement restore() method
+  - [x] Implement import() method
+  - [x] Implement export() method
 
-- [ ] **Databases Controller**
-  - [ ] Create `src/modules/databases/databases.controller.ts`
-  - [ ] GET /databases endpoint
-  - [ ] POST /databases endpoint
-  - [ ] GET /databases/:id endpoint
-  - [ ] DELETE /databases/:id endpoint
-  - [ ] GET /databases/:id/users endpoint
-  - [ ] POST /databases/:id/users endpoint
-  - [ ] DELETE /databases/:id/users/:userId endpoint
-  - [ ] POST /databases/:id/backup endpoint
-  - [ ] POST /databases/:id/restore endpoint
+- [x] **Databases Controller**
+  - [x] Create `src/modules/databases/databases.controller.ts`
+  - [x] GET /databases endpoint
+  - [x] POST /databases endpoint
+  - [x] GET /databases/:id endpoint
+  - [x] DELETE /databases/:id endpoint
+  - [x] GET /databases/:id/users endpoint
+  - [x] POST /databases/:id/users endpoint
+  - [x] DELETE /databases/:id/users/:userId endpoint
+  - [x] POST /databases/:id/backup endpoint
+  - [x] POST /databases/:id/restore endpoint
 
 ### 4.2 DNS Management
 
-- [ ] **DNS Zone Entity**
-  - [ ] Create `src/modules/dns/entities/dns-zone.entity.ts`
-  - [ ] Define fields: zoneName, serial, ttl, primaryNs, adminEmail
-  - [ ] Add SOA fields (refresh, retry, expire, minimum)
-  - [ ] Add domain relationship
-  - [ ] Create database migration
+- [x] **DNS Zone Entity**
+  - [x] Create `src/modules/dns/entities/dns-zone.entity.ts`
+  - [x] Define fields: zoneName, serial, ttl, primaryNs, adminEmail
+  - [x] Add SOA fields (refresh, retry, expire, minimum)
+  - [x] Add domain relationship
+  - [x] Create database migration
 
-- [ ] **DNS Record Entity**
-  - [ ] Create dns-record.entity.ts
-  - [ ] Define fields: name, type, value, ttl, priority
-  - [ ] Support record types: A, AAAA, CNAME, MX, TXT, NS, SRV, CAA
-  - [ ] Add zone relationship
-  - [ ] Create database migration
+- [x] **DNS Record Entity**
+  - [x] Create dns-record.entity.ts
+  - [x] Define fields: name, type, value, ttl, priority
+  - [x] Support record types: A, AAAA, CNAME, MX, TXT, NS, SRV, CAA
+  - [x] Add zone relationship
+  - [x] Create database migration
 
-- [ ] **Bind9 Service**
-  - [ ] Create `src/modules/dns/bind9.service.ts`
-  - [ ] Create zone file template
-  - [ ] Implement generateZoneFile() method
-  - [ ] Implement writeZoneFile() method
-  - [ ] Implement updateNamedConf() method
-  - [ ] Implement checkZone() method (named-checkzone)
-  - [ ] Implement checkConfig() method (named-checkconf)
-  - [ ] Implement reloadZone() method (rndc reload)
-  - [ ] Implement incrementSerial() method
+- [x] **Bind9 Service**
+  - [x] Create `src/modules/dns/services/bind9.service.ts`
+  - [x] Create zone file template
+  - [x] Implement generateZoneFile() method
+  - [x] Implement writeZoneFile() method
+  - [x] Implement updateNamedConf() method
+  - [x] Implement checkZone() method (named-checkzone)
+  - [x] Implement checkConfig() method (named-checkconf)
+  - [x] Implement reloadZone() method (rndc reload)
+  - [x] Implement incrementSerial() method
 
-- [ ] **DNS Service**
-  - [ ] Create `src/modules/dns/dns.service.ts`
-  - [ ] Implement createZone() with default records
-  - [ ] Implement deleteZone() method
-  - [ ] Implement addRecord() method
-  - [ ] Implement updateRecord() method
-  - [ ] Implement deleteRecord() method
-  - [ ] Implement validateRecord() method
+- [x] **DNS Service**
+  - [x] Create `src/modules/dns/dns.service.ts`
+  - [x] Implement createZone() with default records
+  - [x] Implement deleteZone() method
+  - [x] Implement addRecord() method
+  - [x] Implement updateRecord() method
+  - [x] Implement deleteRecord() method
+  - [x] Implement applyTemplate() method
 
-- [ ] **DNS Controller**
-  - [ ] Create `src/modules/dns/dns.controller.ts`
-  - [ ] GET /domains/:domainId/dns endpoint
-  - [ ] POST /domains/:domainId/dns endpoint
-  - [ ] GET /domains/:domainId/dns/records endpoint
-  - [ ] POST /domains/:domainId/dns/records endpoint
-  - [ ] PATCH /dns/records/:id endpoint
-  - [ ] DELETE /dns/records/:id endpoint
+- [x] **DNS Controller**
+  - [x] Create `src/modules/dns/dns.controller.ts`
+  - [x] GET /dns/zones endpoint
+  - [x] POST /dns/zones endpoint
+  - [x] GET /dns/zones/:id endpoint
+  - [x] DELETE /dns/zones/:id endpoint
+  - [x] GET /dns/zones/:zoneId/records endpoint
+  - [x] POST /dns/zones/:zoneId/records endpoint
+  - [x] PATCH /dns/records/:id endpoint
+  - [x] DELETE /dns/records/:id endpoint
+  - [x] POST /dns/zones/:id/template endpoint
 
 ### 4.3 Frontend - Databases & DNS
 
-- [ ] **Database Management Pages**
-  - [ ] Create DatabasesPage with DataTable
-  - [ ] Create DatabaseCreateModal
-  - [ ] Create DatabaseDetailPage
-  - [ ] Create DatabaseUserForm
-  - [ ] Create DatabaseUserList
-  - [ ] Create BackupRestorePanel
-  - [ ] Implement useDatabases hook
+- [x] **Database Management Pages**
+  - [x] Create DatabasesPage with card grid
+  - [x] Create DatabaseCreateModal
+  - [x] Create DatabaseDetailPage
+  - [x] Create DatabaseUserForm
+  - [x] Create DatabaseUsersTab
+  - [x] Create DatabaseBackupTab
+  - [x] Create DatabaseInfoTab
+  - [x] Implement useDatabases hook
 
-- [ ] **DNS Management Pages**
-  - [ ] Create DNSPage component
-  - [ ] Create ZoneList component
-  - [ ] Create ZoneEditor component
-  - [ ] Create RecordForm component (dynamic by type)
-  - [ ] Create DNSTemplates component
-  - [ ] Implement useDNS hook
-  - [ ] Add record type validation
+- [x] **DNS Management Pages**
+  - [x] Create DnsPage component
+  - [x] Create DnsZoneDetailPage component
+  - [x] Create DnsZoneCreateModal component
+  - [x] Create DnsRecordsTab component
+  - [x] Create DnsRecordForm component (dynamic by type)
+  - [x] Create DnsZoneSettingsTab component
+  - [x] Create DnsTemplateModal component
+  - [x] Implement useDns hook
+  - [x] Add record type validation
 
 ---
 

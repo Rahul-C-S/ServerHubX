@@ -175,6 +175,8 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)+$/, // Home directory paths (not root)
       /^\/etc\/(apache2|httpd)\/sites-(available|enabled)\/[a-z0-9][a-z0-9.-]{0,253}\.conf$/,
       /^\/etc\/php\/[0-9.]+\/fpm\/pool\.d\/[a-z][a-z0-9_-]{0,31}\.conf$/,
+      /^\/var\/named\/[a-z0-9][a-z0-9.-]{0,253}\.zone$/, // DNS zone files
+      /^\/etc\/bind\/zones\/[a-z0-9][a-z0-9.-]{0,253}\.zone$/,
     ],
   },
   cp: {
@@ -249,6 +251,17 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^[a-z0-9][a-z0-9.-]{0,253}$/, // Zone name
       /^\/var\/named\/[a-z0-9][a-z0-9.-]{0,253}\.zone$/,
       /^\/etc\/bind\/zones\/[a-z0-9][a-z0-9.-]{0,253}\.zone$/,
+    ],
+  },
+  sed: {
+    command: 'sed',
+    description: 'Stream editor',
+    requiresSudo: true,
+    allowedArgumentPatterns: [
+      /^-i$/,
+      /^\/zone "[a-z0-9][a-z0-9.-]{0,253}"\/,\/\^};\$\/d$/,
+      /^\/etc\/bind\/named\.conf\.local$/,
+      /^\/etc\/named\.conf\.local$/,
     ],
   },
   'named-checkconf': {

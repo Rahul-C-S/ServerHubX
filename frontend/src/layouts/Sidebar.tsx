@@ -13,6 +13,7 @@ import {
   Server,
   ChevronLeft,
   ChevronRight,
+  Network,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/uiStore';
@@ -31,6 +32,7 @@ const navItems: NavItem[] = [
   { icon: Globe, label: 'Domains', href: '/domains' },
   { icon: Box, label: 'Applications', href: '/apps' },
   { icon: Database, label: 'Databases', href: '/databases' },
+  { icon: Network, label: 'DNS', href: '/dns' },
   { icon: Mail, label: 'Email', href: '/email' },
   { icon: Shield, label: 'SSL Certificates', href: '/ssl' },
   { icon: HardDrive, label: 'Backups', href: '/backups' },
