@@ -393,6 +393,67 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^\/$/,
     ],
   },
+
+  // User check commands
+  id: {
+    command: 'id',
+    description: 'Check if user exists',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^[a-z][a-z0-9_-]{0,31}$/, // Username
+    ],
+  },
+  getent: {
+    command: 'getent',
+    description: 'Get entries from databases',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^passwd$/,
+      /^group$/,
+      /^shadow$/,
+      /^[a-z][a-z0-9_-]{0,31}$/, // Username or group name
+    ],
+  },
+
+  // File operations
+  du: {
+    command: 'du',
+    description: 'Disk usage',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^-s$/, // Summary
+      /^-m$/, // Megabytes
+      /^-sm$/, // Combined
+      /^-h$/, // Human readable
+      /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)*$/,
+    ],
+  },
+  find: {
+    command: 'find',
+    description: 'Find files',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)*$/,
+      /^-type$/,
+      /^[fdl]$/, // file, directory, link
+      /^-name$/,
+      /^[a-zA-Z0-9*?._-]+$/, // File name pattern
+    ],
+  },
+  tee: {
+    command: 'tee',
+    description: 'Write to file',
+    requiresSudo: true,
+    allowedArgumentPatterns: [
+      /^-a$/, // Append
+      /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)+$/,
+      /^\/etc\/(apache2|httpd)\/sites-available\/[a-z0-9][a-z0-9.-]{0,253}\.conf$/,
+      /^\/etc\/php\/[0-9.]+\/fpm\/pool\.d\/[a-z][a-z0-9_-]{0,31}\.conf$/,
+      /^\/etc\/php-fpm\.d\/[a-z][a-z0-9_-]{0,31}\.conf$/,
+      /^\/etc\/bind\/zones\/[a-z0-9][a-z0-9.-]{0,253}\.zone$/,
+      /^\/var\/named\/[a-z0-9][a-z0-9.-]{0,253}\.zone$/,
+    ],
+  },
 };
 
 export function isCommandAllowed(command: string): boolean {

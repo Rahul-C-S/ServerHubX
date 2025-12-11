@@ -9,6 +9,7 @@ ServerHubX is a web-based hosting and server management dashboard designed to re
 **Target OS:** Ubuntu, Debian, Rocky/AlmaLinux, CentOS Stream
 
 *** A comprehensive implementation plan is written in `docs/plan.md` ***
+*** Always use nestjs cli to create modules, services, etc. Also for front end use available cli tools ***
 
 ## Tech Stack
 

@@ -73,11 +73,11 @@ Both should return your server's IP address.
 
 ---
 
-## Phase 1: Foundation (Week 1-2)
+## Phase 1: Foundation (Week 1-2) ✅ COMPLETED
 
 ### 1.1 Backend Project Setup
 
-- [ ] **Initialize NestJS project**
+- [x] **Initialize NestJS project**
   > Set up the foundational NestJS application with TypeScript. NestJS provides a modular architecture ideal for building scalable server applications with dependency injection, decorators, and a clear separation of concerns.
   - [ ] Create new NestJS project with TypeScript (`nest new backend`) - generates the basic project structure with main.ts, app.module.ts, and configuration files
   - [ ] Configure TypeScript strict mode in `tsconfig.json` - enables strict null checks, implicit any errors, and other type safety features to catch bugs at compile time
@@ -328,138 +328,138 @@ Both should return your server's IP address.
 
 ---
 
-## Phase 2: Users & Domains (Week 3-4)
+## Phase 2: Users & Domains (Week 3-4) ✅ COMPLETED
 
 ### 2.1 System Users Module (Linux Users)
 
-- [ ] **System User Entity**
-  - [ ] Create `src/modules/system-users/entities/system-user.entity.ts`
-  - [ ] Define fields: username, uid, gid, homeDirectory, shell
-  - [ ] Add diskQuota and diskUsed fields
-  - [ ] Add sshEnabled field
-  - [ ] Create one-to-one relationship with Domain
-  - [ ] Create database migration
+- [x] **System User Entity**
+  - [x] Create `src/modules/system-users/entities/system-user.entity.ts`
+  - [x] Define fields: username, uid, gid, homeDirectory, shell
+  - [x] Add diskQuota and diskUsed fields
+  - [x] Add sshEnabled field
+  - [x] Create one-to-one relationship with Domain
+  - [x] Create database migration
 
-- [ ] **System Users Service**
-  - [ ] Create `src/modules/system-users/system-users.service.ts`
-  - [ ] Implement createUser() with useradd command
-  - [ ] Implement deleteUser() with userdel command
-  - [ ] Implement setPassword() with chpasswd
-  - [ ] Implement setQuota() with setquota command
-  - [ ] Implement getQuotaUsage() method
-  - [ ] Add rollback support for user creation
+- [x] **System Users Service**
+  - [x] Create `src/modules/system-users/system-users.service.ts`
+  - [x] Implement createUser() with useradd command
+  - [x] Implement deleteUser() with userdel command
+  - [x] Implement setPassword() with chpasswd
+  - [x] Implement setQuota() with setquota command
+  - [x] Implement getQuotaUsage() method
+  - [x] Add rollback support for user creation
 
-- [ ] **SSH Key Management**
-  - [ ] Create SSHKey entity
-  - [ ] Implement addSSHKey() method
-  - [ ] Implement removeSSHKey() method
-  - [ ] Implement listSSHKeys() method
-  - [ ] Write to ~/.ssh/authorized_keys
+- [x] **SSH Key Management**
+  - [x] Create SSHKey entity
+  - [x] Implement addSSHKey() method
+  - [x] Implement removeSSHKey() method
+  - [x] Implement listSSHKeys() method
+  - [x] Write to ~/.ssh/authorized_keys
 
-- [ ] **Home Directory Setup**
-  - [ ] Create directory structure (/home/username/public_html, logs, tmp, ssl)
-  - [ ] Set proper ownership (chown)
-  - [ ] Set proper permissions (chmod)
-  - [ ] Create default index.html
+- [x] **Home Directory Setup**
+  - [x] Create directory structure (/home/username/public_html, logs, tmp, ssl)
+  - [x] Set proper ownership (chown)
+  - [x] Set proper permissions (chmod)
+  - [x] Create default index.html
 
-- [ ] **System Users Controller**
-  - [ ] Create `src/modules/system-users/system-users.controller.ts`
-  - [ ] GET /system-users endpoint (admin only)
-  - [ ] POST /system-users endpoint
-  - [ ] GET /system-users/:id endpoint
-  - [ ] DELETE /system-users/:id endpoint
-  - [ ] POST /system-users/:id/ssh-keys endpoint
-  - [ ] DELETE /system-users/:id/ssh-keys/:keyId endpoint
+- [x] **System Users Controller**
+  - [x] Create `src/modules/system-users/system-users.controller.ts`
+  - [x] GET /system-users endpoint (admin only)
+  - [x] POST /system-users endpoint
+  - [x] GET /system-users/:id endpoint
+  - [x] DELETE /system-users/:id endpoint
+  - [x] POST /system-users/:id/ssh-keys endpoint
+  - [x] DELETE /system-users/:id/ssh-keys/:keyId endpoint
 
 ### 2.2 Domains Module
 
-- [ ] **Domain Entity**
-  - [ ] Create `src/modules/domains/entities/domain.entity.ts`
-  - [ ] Define fields: name, status, documentRoot, webServer
-  - [ ] Add phpVersion and nodeVersion fields
-  - [ ] Add sslEnabled and forceHttps fields
-  - [ ] Add owner relationship to User
-  - [ ] Add systemUser relationship
-  - [ ] Create database migration
+- [x] **Domain Entity**
+  - [x] Create `src/modules/domains/entities/domain.entity.ts`
+  - [x] Define fields: name, status, documentRoot, webServer
+  - [x] Add phpVersion and nodeVersion fields
+  - [x] Add sslEnabled and forceHttps fields
+  - [x] Add owner relationship to User
+  - [x] Add systemUser relationship
+  - [x] Create database migration
 
-- [ ] **Subdomain Entity**
-  - [ ] Create subdomain.entity.ts
-  - [ ] Define fields: name, documentRoot
-  - [ ] Add parentDomain relationship
-  - [ ] Create database migration
+- [x] **Subdomain Entity**
+  - [x] Create subdomain.entity.ts
+  - [x] Define fields: name, documentRoot
+  - [x] Add parentDomain relationship
+  - [x] Create database migration
 
-- [ ] **VHost Service**
-  - [ ] Create `src/modules/domains/vhost.service.ts`
-  - [ ] Create Apache VirtualHost template for PHP sites
-  - [ ] Create Apache VirtualHost template for Node.js (reverse proxy)
-  - [ ] Create SSL VirtualHost template
-  - [ ] Implement generateVhostConfig() method
-  - [ ] Implement writeVhostFile() method
-  - [ ] Implement enableSite() method (a2ensite)
-  - [ ] Implement disableSite() method (a2dissite)
-  - [ ] Implement validateConfig() method (apachectl configtest)
-  - [ ] Implement reloadApache() method
+- [x] **VHost Service**
+  - [x] Create `src/modules/domains/vhost.service.ts`
+  - [x] Create Apache VirtualHost template for PHP sites
+  - [x] Create Apache VirtualHost template for Node.js (reverse proxy)
+  - [x] Create SSL VirtualHost template
+  - [x] Implement generateVhostConfig() method
+  - [x] Implement writeVhostFile() method
+  - [x] Implement enableSite() method (a2ensite)
+  - [x] Implement disableSite() method (a2dissite)
+  - [x] Implement validateConfig() method (apachectl configtest)
+  - [x] Implement reloadApache() method
 
-- [ ] **Domains Service**
-  - [ ] Create `src/modules/domains/domains.service.ts`
-  - [ ] Implement create() with full workflow:
-    - [ ] Validate domain name
-    - [ ] Create system user
-    - [ ] Create directory structure
-    - [ ] Generate VHost config
-    - [ ] Enable site
-    - [ ] Reload Apache
-    - [ ] Add rollback on failure
-  - [ ] Implement update() method
-  - [ ] Implement delete() with cleanup
-  - [ ] Implement suspend() method
-  - [ ] Implement unsuspend() method
-  - [ ] Implement findAll() with filtering
-  - [ ] Implement findOne() method
+- [x] **Domains Service**
+  - [x] Create `src/modules/domains/domains.service.ts`
+  - [x] Implement create() with full workflow:
+    - [x] Validate domain name
+    - [x] Create system user
+    - [x] Create directory structure
+    - [x] Generate VHost config
+    - [x] Enable site
+    - [x] Reload Apache
+    - [x] Add rollback on failure
+  - [x] Implement update() method
+  - [x] Implement delete() with cleanup
+  - [x] Implement suspend() method
+  - [x] Implement unsuspend() method
+  - [x] Implement findAll() with filtering
+  - [x] Implement findOne() method
 
-- [ ] **Domains Controller**
-  - [ ] Create `src/modules/domains/domains.controller.ts`
-  - [ ] GET /domains endpoint with pagination
-  - [ ] POST /domains endpoint
-  - [ ] GET /domains/:id endpoint
-  - [ ] PATCH /domains/:id endpoint
-  - [ ] DELETE /domains/:id endpoint
-  - [ ] POST /domains/:id/suspend endpoint
-  - [ ] POST /domains/:id/unsuspend endpoint
-  - [ ] GET /domains/:id/stats endpoint
+- [x] **Domains Controller**
+  - [x] Create `src/modules/domains/domains.controller.ts`
+  - [x] GET /domains endpoint with pagination
+  - [x] POST /domains endpoint
+  - [x] GET /domains/:id endpoint
+  - [x] PATCH /domains/:id endpoint
+  - [x] DELETE /domains/:id endpoint
+  - [x] POST /domains/:id/suspend endpoint
+  - [x] POST /domains/:id/unsuspend endpoint
+  - [x] GET /domains/:id/stats endpoint
 
 ### 2.3 Frontend - Dashboard & Domains
 
-- [ ] **Dashboard Page**
-  - [ ] Create DashboardPage component
-  - [ ] Create ServerOverview component (OS info, uptime)
-  - [ ] Create ResourceUsageCard (CPU, RAM, Disk gauges)
-  - [ ] Create ServiceStatusGrid component
-  - [ ] Create QuickActions component
-  - [ ] Create RecentActivity component
-  - [ ] Create DomainsList widget (top 5 domains)
-  - [ ] Implement useDashboardData hook
+- [x] **Dashboard Page**
+  - [x] Create DashboardPage component
+  - [x] Create ServerOverview component (OS info, uptime)
+  - [x] Create ResourceUsageCard (CPU, RAM, Disk gauges)
+  - [x] Create ServiceStatusGrid component
+  - [x] Create QuickActions component
+  - [x] Create RecentActivity component
+  - [x] Create DomainsList widget (top 5 domains)
+  - [x] Implement useDashboardData hook
 
-- [ ] **Domain Management Pages**
-  - [ ] Create DomainsPage with DataTable
-  - [ ] Implement domain search and filtering
-  - [ ] Create DomainCard component
-  - [ ] Create DomainCreateModal with form
-  - [ ] Create DomainEditModal
-  - [ ] Create DomainDetailPage
-  - [ ] Implement useDomains hook with React Query
-  - [ ] Implement useCreateDomain mutation
-  - [ ] Implement useUpdateDomain mutation
-  - [ ] Implement useDeleteDomain mutation
+- [x] **Domain Management Pages**
+  - [x] Create DomainsPage with DataTable
+  - [x] Implement domain search and filtering
+  - [x] Create DomainCard component
+  - [x] Create DomainCreateModal with form
+  - [x] Create DomainEditModal
+  - [x] Create DomainDetailPage
+  - [x] Implement useDomains hook with React Query
+  - [x] Implement useCreateDomain mutation
+  - [x] Implement useUpdateDomain mutation
+  - [x] Implement useDeleteDomain mutation
 
-- [ ] **User Management Pages**
-  - [ ] Create UsersPage with DataTable
-  - [ ] Create UserCreateModal
-  - [ ] Create UserEditModal
-  - [ ] Create UserDetailPage
-  - [ ] Create QuotaManager component
-  - [ ] Create SSHKeyManager component
-  - [ ] Implement useUsers hook
+- [x] **User Management Pages**
+  - [x] Create UsersPage with DataTable
+  - [x] Create UserCreateModal
+  - [x] Create UserEditModal
+  - [x] Create UserDetailPage
+  - [x] Create QuotaManager component
+  - [x] Create SSHKeyManager component
+  - [x] Implement useUsers hook
 
 ---
 

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Server, Mail, ArrowLeft } from 'lucide-react';
-import { Button, Input, Card, CardContent, Alert } from '@/components/ui';
+import { Button, Input, Card, CardContent } from '@/components/ui';
 import { useForgotPassword } from '@/hooks/useAuth';
 
 export function ForgotPasswordPage() {
