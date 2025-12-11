@@ -5,6 +5,8 @@ export * from './database';
 export * from './dns';
 export * from './ssl';
 export * from './mail';
+export * from './terminal';
+export * from './files';
 
 export interface ApiError {
   message: string;

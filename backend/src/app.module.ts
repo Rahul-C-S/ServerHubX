@@ -24,6 +24,8 @@ import { DatabasesModule } from './modules/databases/databases.module.js';
 import { DnsModule } from './modules/dns/dns.module.js';
 import { SslModule } from './modules/ssl/ssl.module.js';
 import { MailModule } from './modules/mail/mail.module.js';
+import { TerminalModule } from './modules/terminal/terminal.module.js';
+import { FileManagerModule } from './modules/file-manager/file-manager.module.js';
 
 @Module({
   imports: [
@@ -75,6 +77,8 @@ import { MailModule } from './modules/mail/mail.module.js';
     DnsModule,
     SslModule,
     MailModule,
+    TerminalModule,
+    FileManagerModule,
   ],
   controllers: [AppController],
   providers: [

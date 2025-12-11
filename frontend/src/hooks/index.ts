@@ -6,3 +6,5 @@ export * from './useDatabases';
 export * from './useDns';
 export * from './useSsl';
 export * from './useMail';
+export * from './useTerminal';
+export * from './useFileManager';

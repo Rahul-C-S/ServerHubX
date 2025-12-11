@@ -21,6 +21,8 @@ import {
   DnsZoneDetailPage,
   MailPage,
   MailDomainDetailPage,
+  TerminalPage,
+  FilesPage,
 } from '@/pages';
 
 function AppContent() {
@@ -63,7 +65,8 @@ function AppContent() {
         <Route path="/mail" element={<MailPage />} />
         <Route path="/mail/:id" element={<MailDomainDetailPage />} />
         <Route path="/backups" element={<PlaceholderPage title="Backups" />} />
-        <Route path="/terminal" element={<PlaceholderPage title="Terminal" />} />
+        <Route path="/terminal" element={<TerminalPage />} />
+        <Route path="/files" element={<FilesPage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
       </Route>

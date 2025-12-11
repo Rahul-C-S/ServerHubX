@@ -7,3 +7,5 @@ export * from './databases';
 export * from './dns';
 export * from './ssl';
 export * from './mail';
+export * from './terminal';
+export * from './files';

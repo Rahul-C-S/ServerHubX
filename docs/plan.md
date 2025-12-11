@@ -861,108 +861,104 @@ Both should return your server's IP address.
 
 ---
 
-## Phase 6: Terminal & File Manager (Week 12-13)
+## Phase 6: Terminal & File Manager (Week 12-13) ✅ COMPLETED
 
 ### 6.1 Web Terminal
 
-- [ ] **Terminal Session Entity**
-  - [ ] Create `src/modules/terminal/entities/terminal-session.entity.ts`
-  - [ ] Define fields: sessionId, username, clientIp, endedAt
-  - [ ] Add user relationship
-  - [ ] Create database migration
+- [x] **Terminal Session Entity**
+  - [x] Create `src/modules/terminal/entities/terminal-session.entity.ts`
+  - [x] Define fields: sessionId, username, clientIp, endedAt
+  - [x] Add user relationship
+  - [x] Create database migration
 
-- [ ] **Session Manager Service**
-  - [ ] Create `src/modules/terminal/session-manager.service.ts`
-  - [ ] Install node-pty package
-  - [ ] Implement createSession() with PTY
-  - [ ] Implement getSession() method
-  - [ ] Implement destroySession() method
-  - [ ] Implement cleanupIdleSessions() method
-  - [ ] Store sessions in memory Map
-  - [ ] Log session creation/destruction
+- [x] **Session Manager Service**
+  - [x] Create `src/modules/terminal/session-manager.service.ts`
+  - [x] Install node-pty package
+  - [x] Implement createSession() with PTY
+  - [x] Implement getSession() method
+  - [x] Implement destroySession() method
+  - [x] Implement cleanupIdleSessions() method
+  - [x] Store sessions in memory Map
+  - [x] Log session creation/destruction
 
-- [ ] **Terminal Service**
-  - [ ] Create `src/modules/terminal/terminal.service.ts`
-  - [ ] Implement getLinuxUser() for session user
-  - [ ] Verify user permissions for domain
-  - [ ] Set up PTY environment variables
+- [x] **Terminal Service**
+  - [x] Create `src/modules/terminal/terminal.service.ts`
+  - [x] Implement getLinuxUser() for session user
+  - [x] Verify user permissions for domain
+  - [x] Set up PTY environment variables
 
-- [ ] **Terminal WebSocket Gateway**
-  - [ ] Create `src/modules/terminal/terminal.gateway.ts`
-  - [ ] Implement handleConnection() with JWT auth
-  - [ ] Implement handleDisconnect() with cleanup
-  - [ ] Handle 'terminal:create' event
-  - [ ] Handle 'terminal:input' event
-  - [ ] Handle 'terminal:resize' event
-  - [ ] Forward PTY output to client
-  - [ ] Handle PTY exit event
+- [x] **Terminal WebSocket Gateway**
+  - [x] Create `src/modules/terminal/terminal.gateway.ts`
+  - [x] Implement handleConnection() with JWT auth
+  - [x] Implement handleDisconnect() with cleanup
+  - [x] Handle 'terminal:start' event
+  - [x] Handle 'terminal:input' event
+  - [x] Handle 'terminal:resize' event
+  - [x] Forward PTY output to client
+  - [x] Handle PTY exit event
 
-- [ ] **WebSocket Authentication**
-  - [ ] Create WsJwtGuard
-  - [ ] Extract token from handshake
-  - [ ] Validate token and attach user
+- [x] **WebSocket Authentication**
+  - [x] Create WsJwtGuard
+  - [x] Extract token from handshake
+  - [x] Validate token and attach user
 
 ### 6.2 File Manager
 
-- [ ] **File Manager Service**
-  - [ ] Create `src/modules/file-manager/file-manager.service.ts`
-  - [ ] Implement listDirectory() method
-  - [ ] Implement readFile() method
-  - [ ] Implement writeFile() method
-  - [ ] Implement createDirectory() method
-  - [ ] Implement deleteFile() method
-  - [ ] Implement deleteDirectory() method
-  - [ ] Implement moveFile() method
-  - [ ] Implement copyFile() method
-  - [ ] Implement extractArchive() method (tar, zip)
-  - [ ] Implement getPermissions() method
-  - [ ] Implement setPermissions() method
-  - [ ] Implement setOwnership() method
+- [x] **File Manager Service**
+  - [x] Create `src/modules/file-manager/file-manager.service.ts`
+  - [x] Implement listDirectory() method
+  - [x] Implement readFile() method
+  - [x] Implement writeFile() method
+  - [x] Implement createDirectory() method
+  - [x] Implement deleteFile() method
+  - [x] Implement deleteDirectory() method
+  - [x] Implement moveFile() method
+  - [x] Implement copyFile() method
+  - [x] Implement extractArchive() method (tar, zip)
+  - [x] Implement getPermissions() method
+  - [x] Implement setPermissions() method
+  - [x] Implement setOwnership() method
 
-- [ ] **Path Security**
-  - [ ] Validate all paths against user home directory
-  - [ ] Prevent path traversal attacks
-  - [ ] Check file ownership before operations
-  - [ ] Limit file size for read/write
+- [x] **Path Security**
+  - [x] Validate all paths against user home directory
+  - [x] Prevent path traversal attacks
+  - [x] Check file ownership before operations
+  - [x] Limit file size for read/write
 
-- [ ] **File Manager Controller**
-  - [ ] Create `src/modules/file-manager/file-manager.controller.ts`
-  - [ ] GET /files endpoint (list directory)
-  - [ ] POST /files/upload endpoint (multipart)
-  - [ ] GET /files/download endpoint
-  - [ ] POST /files/create endpoint
-  - [ ] DELETE /files endpoint
-  - [ ] POST /files/move endpoint
-  - [ ] POST /files/copy endpoint
-  - [ ] POST /files/extract endpoint
-  - [ ] PATCH /files/permissions endpoint
-  - [ ] GET /files/content endpoint
-  - [ ] PUT /files/content endpoint
+- [x] **File Manager Controller**
+  - [x] Create `src/modules/file-manager/file-manager.controller.ts`
+  - [x] GET /files endpoint (list directory)
+  - [x] POST /files/upload endpoint (multipart)
+  - [x] GET /files/download endpoint
+  - [x] POST /files/create endpoint
+  - [x] DELETE /files endpoint
+  - [x] POST /files/move endpoint
+  - [x] POST /files/copy endpoint
+  - [x] POST /files/extract endpoint
+  - [x] PATCH /files/permissions endpoint
+  - [x] GET /files/content endpoint
+  - [x] PUT /files/content endpoint
 
 ### 6.3 Frontend - Terminal & Files
 
-- [ ] **Terminal Components**
-  - [ ] Install xterm, xterm-addon-fit, xterm-addon-web-links
-  - [ ] Create Terminal component with xterm.js
-  - [ ] Create TerminalToolbar component
-  - [ ] Create TerminalTabs component
-  - [ ] Create TerminalPage with fullscreen option
-  - [ ] Implement useTerminalSession hook
-  - [ ] Implement WebSocket connection management
-  - [ ] Handle terminal resize
+- [x] **Terminal Components**
+  - [x] Install xterm, xterm-addon-fit, xterm-addon-web-links
+  - [x] Create Terminal component with xterm.js
+  - [x] Create TerminalToolbar component
+  - [x] Create TerminalPage with fullscreen option
+  - [x] Implement useTerminal hook
+  - [x] Implement WebSocket connection management
+  - [x] Handle terminal resize
 
-- [ ] **File Manager Components**
-  - [ ] Create FilesPage component
-  - [ ] Create FileTree component (sidebar)
-  - [ ] Create FileList component (main area)
-  - [ ] Create FileViewer component (preview)
-  - [ ] Create FileEditor component (Monaco/CodeMirror)
-  - [ ] Create UploadModal component
-  - [ ] Create PermissionsModal component
-  - [ ] Create NewFileModal component
-  - [ ] Create NewFolderModal component
-  - [ ] Implement drag-and-drop upload
-  - [ ] Implement useFileManager hook
+- [x] **File Manager Components**
+  - [x] Create FilesPage component
+  - [x] Create FileList component (main area)
+  - [x] Create FileBreadcrumb component
+  - [x] Create FileToolbar component
+  - [x] Create UploadModal component
+  - [x] Create NewFileModal component
+  - [x] Create NewFolderModal component
+  - [x] Implement useFileManager hooks
 
 ---
 
