@@ -6,7 +6,7 @@ import { useUIStore } from '@/store/uiStore';
 import { useAuthStore } from '@/store/authStore';
 import { MainLayout } from '@/layouts';
 import { ProtectedRoute } from '@/components/common';
-import { LoginPage, ForgotPasswordPage, DashboardPage, DomainsPage, DomainDetailPage, UsersPage } from '@/pages';
+import { LoginPage, ForgotPasswordPage, DashboardPage, DomainsPage, DomainDetailPage, UsersPage, AppsPage, AppDetailPage } from '@/pages';
 
 function AppContent() {
   const { theme, setTheme } = useUIStore();
@@ -39,6 +39,8 @@ function AppContent() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/domains" element={<DomainsPage />} />
         <Route path="/domains/:id" element={<DomainDetailPage />} />
+        <Route path="/apps" element={<AppsPage />} />
+        <Route path="/apps/:id" element={<AppDetailPage />} />
         <Route path="/databases" element={<PlaceholderPage title="Databases" />} />
         <Route path="/email" element={<PlaceholderPage title="Email" />} />
         <Route path="/ssl" element={<PlaceholderPage title="SSL Certificates" />} />

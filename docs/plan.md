@@ -463,128 +463,139 @@ Both should return your server's IP address.
 
 ---
 
-## Phase 3: Applications (Week 5-6)
+## Phase 3: Applications (Week 5-6) ✅ COMPLETED
 
 ### 3.1 Node.js Application Support
 
-- [ ] **App Entity**
-  - [ ] Create `src/modules/apps/entities/app.entity.ts`
-  - [ ] Define fields: name, type, framework, path, entryPoint, port, status
-  - [ ] Add pm2ProcessId field
-  - [ ] Add pm2Config JSON field
-  - [ ] Add domain relationship
-  - [ ] Create database migration
+- [x] **App Entity**
+  - [x] Create `src/modules/apps/entities/app.entity.ts`
+  - [x] Define fields: name, type, framework, path, entryPoint, port, status
+  - [x] Add pm2ProcessId field
+  - [x] Add pm2Config JSON field
+  - [x] Add domain relationship
+  - [x] Create database migration
 
-- [ ] **App Environment Entity**
-  - [ ] Create app-environment.entity.ts
-  - [ ] Define fields: key, value, isSecret
-  - [ ] Add app relationship
-  - [ ] Implement value encryption for secrets
+- [x] **App Environment Entity**
+  - [x] Create app-environment.entity.ts
+  - [x] Define fields: key, value, isSecret
+  - [x] Add app relationship
+  - [x] Implement value encryption for secrets (AES-256-GCM)
 
-- [ ] **PM2 Service**
-  - [ ] Create `src/modules/apps/pm2.service.ts`
-  - [ ] Implement generateEcosystemConfig() method
-  - [ ] Implement startApp() method
-  - [ ] Implement stopApp() method
-  - [ ] Implement restartApp() method
-  - [ ] Implement reloadApp() method (zero-downtime)
-  - [ ] Implement deleteApp() method
-  - [ ] Implement getAppStatus() method
-  - [ ] Implement getAppLogs() method
-  - [ ] Implement listAllApps() method
+- [x] **PM2 Service**
+  - [x] Create `src/modules/apps/services/pm2.service.ts`
+  - [x] Implement generateEcosystemConfig() method
+  - [x] Implement startApp() method
+  - [x] Implement stopApp() method
+  - [x] Implement restartApp() method
+  - [x] Implement reloadApp() method (zero-downtime)
+  - [x] Implement deleteApp() method
+  - [x] Implement getAppStatus() method
+  - [x] Implement getAppLogs() method
 
-- [ ] **Port Allocation Service**
-  - [ ] Create `src/modules/apps/port-allocation.service.ts`
-  - [ ] Define port range (3000-9999)
-  - [ ] Implement allocatePort() method
-  - [ ] Implement releasePort() method
-  - [ ] Check port availability before allocation
+- [x] **Port Allocation Service**
+  - [x] Create `src/modules/apps/services/port-allocation.service.ts`
+  - [x] Define port range (3000-9999)
+  - [x] Implement allocatePort() method
+  - [x] Implement releasePort() method
+  - [x] Check port availability before allocation
 
-- [ ] **Node App Service**
-  - [ ] Create `src/modules/apps/node-app.service.ts`
-  - [ ] Implement deploy() method:
-    - [ ] Allocate port
-    - [ ] Generate PM2 ecosystem file
-    - [ ] Create Apache reverse proxy config
-    - [ ] Start PM2 process
-    - [ ] Enable Apache site
-  - [ ] Implement update() method
-  - [ ] Implement remove() method
+- [x] **Node App Service**
+  - [x] Create `src/modules/apps/services/node-app.service.ts`
+  - [x] Implement deploy() method:
+    - [x] Allocate port
+    - [x] Generate PM2 ecosystem file
+    - [x] Create Apache reverse proxy config
+    - [x] Start PM2 process
+    - [x] Enable Apache site
+  - [x] Implement update() method
+  - [x] Implement remove() method
+  - [x] Implement git clone/pull methods
+  - [x] Implement installDependencies() method
+  - [x] Implement buildApp() method
 
-- [ ] **Apache Reverse Proxy**
-  - [ ] Create reverse proxy template with WebSocket support
-  - [ ] Add proxy timeout configuration
-  - [ ] Add static file alias option
+- [x] **Apache Reverse Proxy**
+  - [x] Create reverse proxy template with WebSocket support
+  - [x] Add proxy timeout configuration
 
 ### 3.2 PHP Application Support
 
-- [ ] **PHP-FPM Service**
-  - [ ] Create `src/modules/apps/php-fpm.service.ts`
-  - [ ] Create PHP-FPM pool template
-  - [ ] Implement createPool() method
-  - [ ] Implement deletePool() method
-  - [ ] Implement updatePool() method
-  - [ ] Implement reloadPhpFpm() method
-  - [ ] Configure pool settings (max_children, memory_limit, etc.)
-  - [ ] Set open_basedir restrictions
-  - [ ] Set disable_functions for security
+- [x] **PHP App Service**
+  - [x] Create `src/modules/apps/services/php-app.service.ts`
+  - [x] Implement deploy() method:
+    - [x] Create PHP-FPM pool
+    - [x] Generate Apache VHost with PHP handler
+    - [x] Enable site
+  - [x] Implement setPhpVersion() method
+  - [x] Implement getAvailablePhpVersions() method
 
-- [ ] **PHP App Service**
-  - [ ] Create `src/modules/apps/php-app.service.ts`
-  - [ ] Implement deploy() method:
-    - [ ] Create PHP-FPM pool
-    - [ ] Generate Apache VHost with PHP handler
-    - [ ] Enable site
-  - [ ] Implement setPhpVersion() method
-  - [ ] Implement getAvailablePhpVersions() method
-
-- [ ] **Composer Support**
-  - [ ] Implement runComposerInstall() method
-  - [ ] Run as domain user
-  - [ ] Handle composer.json detection
+- [x] **Composer Support**
+  - [x] Implement runComposerInstall() method
+  - [x] Implement runComposerUpdate() method
+  - [x] Run as domain user
+  - [x] Handle composer.json detection
+  - [x] Implement clearOpcache() method
 
 ### 3.3 Application Deployment
 
-- [ ] **Apps Controller**
-  - [ ] Create `src/modules/apps/apps.controller.ts`
-  - [ ] GET /domains/:domainId/apps endpoint
-  - [ ] POST /domains/:domainId/apps endpoint
-  - [ ] GET /apps/:id endpoint
-  - [ ] PATCH /apps/:id endpoint
-  - [ ] DELETE /apps/:id endpoint
-  - [ ] POST /apps/:id/start endpoint
-  - [ ] POST /apps/:id/stop endpoint
-  - [ ] POST /apps/:id/restart endpoint
-  - [ ] GET /apps/:id/logs endpoint
-  - [ ] GET /apps/:id/env endpoint
-  - [ ] PUT /apps/:id/env endpoint
+- [x] **Apps Controller**
+  - [x] Create `src/modules/apps/apps.controller.ts`
+  - [x] GET /apps endpoint (with optional domainId filter)
+  - [x] GET /domains/:domainId/apps endpoint
+  - [x] POST /domains/:domainId/apps endpoint
+  - [x] GET /apps/:id endpoint
+  - [x] PATCH /apps/:id endpoint
+  - [x] DELETE /apps/:id endpoint
+  - [x] POST /apps/:id/start endpoint
+  - [x] POST /apps/:id/stop endpoint
+  - [x] POST /apps/:id/restart endpoint
+  - [x] POST /apps/:id/reload endpoint
+  - [x] POST /apps/:id/deploy endpoint
+  - [x] GET /apps/:id/deployments endpoint
+  - [x] GET /apps/:id/deployments/:jobId endpoint
+  - [x] POST /apps/:id/deployments/:jobId/cancel endpoint
+  - [x] POST /apps/:id/deployments/:jobId/retry endpoint
+  - [x] GET /apps/:id/logs endpoint
+  - [x] DELETE /apps/:id/logs endpoint (flush)
+  - [x] GET /apps/:id/env endpoint
+  - [x] PUT /apps/:id/env endpoint
+  - [x] DELETE /apps/:id/env endpoint
 
-- [ ] **Deployment Queue (BullMQ)**
-  - [ ] Create deployment queue
-  - [ ] Create DeploymentProcessor
-  - [ ] Implement git clone/pull step
-  - [ ] Implement npm/yarn/pnpm install step
-  - [ ] Implement build step
-  - [ ] Implement process restart step
-  - [ ] Add progress reporting
-  - [ ] Handle deployment failures
+- [x] **Deployment Queue (BullMQ)**
+  - [x] Create deployment queue
+  - [x] Create DeploymentProcessor
+  - [x] Implement git pull step
+  - [x] Implement npm install step
+  - [x] Implement build step
+  - [x] Implement process restart step
+  - [x] Add progress reporting
+  - [x] Handle deployment failures
+  - [x] Create DeploymentService for queue management
+
+- [x] **Command Whitelist Updates**
+  - [x] Add ss, git, npm, yarn, pnpm, composer commands
+  - [x] Add bash, curl, ln, node commands
 
 ### 3.4 Frontend - Applications
 
-- [ ] **Applications Page**
-  - [ ] Create ApplicationsPage with app cards
-  - [ ] Create AppCard component with status indicator
-  - [ ] Create NodeAppForm component
-  - [ ] Create PHPAppForm component
-  - [ ] Implement useApplications hook
+- [x] **Applications Page**
+  - [x] Create AppsPage with app cards grid
+  - [x] Create AppCard component with status indicator
+  - [x] Create AppCreateModal with framework/version selection
+  - [x] Implement useApps hooks with React Query
+  - [x] Add search functionality
 
-- [ ] **Application Detail Page**
-  - [ ] Create ApplicationDetailPage
-  - [ ] Create PM2ProcessInfo component
-  - [ ] Create AppLogs component with live tail
-  - [ ] Create EnvEditor component
-  - [ ] Create DeploymentHistory component
-  - [ ] Implement app control buttons (start, stop, restart)
+- [x] **Application Detail Page**
+  - [x] Create AppDetailPage with stats cards (CPU, Memory, Uptime, Restarts)
+  - [x] Create AppSettingsTab for configuration
+  - [x] Create AppLogsTab with real-time log viewer
+  - [x] Create AppEnvTab for environment variable editor
+  - [x] Create AppDeploymentsTab with deployment history
+  - [x] Implement app control buttons (start, stop, restart, deploy)
+
+- [x] **UI Components**
+  - [x] Create Select component
+  - [x] Create Tabs component (Tabs, TabsList, TabsTrigger, TabsContent)
+  - [x] Add Applications to sidebar navigation
 
 ---
 

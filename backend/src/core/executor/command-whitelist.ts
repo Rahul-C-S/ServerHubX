@@ -360,11 +360,173 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^--env$/,
       /^--interpreter$/,
       /^--cwd$/,
+      /^--lines$/,
+      /^--nostream$/,
+      /^--json$/,
       /^[a-z][a-z0-9_-]{0,63}$/, // Process name
       /^\d+$/, // Process ID
       /^[0-9]+[KMG]?$/, // Memory limit
       /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)*$/, // Path
       /^node$/,
+    ],
+  },
+
+  // Network commands
+  ss: {
+    command: 'ss',
+    description: 'Socket statistics',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^-t$/, // TCP
+      /^-l$/, // Listening
+      /^-n$/, // No resolve
+      /^-p$/, // Process
+      /^-tlnp$/, // Combined
+      /^sport = :\d+$/, // Source port filter
+    ],
+  },
+
+  // Git commands
+  git: {
+    command: 'git',
+    description: 'Git version control',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^clone$/,
+      /^pull$/,
+      /^fetch$/,
+      /^checkout$/,
+      /^reset$/,
+      /^status$/,
+      /^log$/,
+      /^-b$/, // Branch
+      /^-1$/,
+      /^--single-branch$/,
+      /^--hard$/,
+      /^--soft$/,
+      /^origin$/,
+      /^HEAD~?\d*$/,
+      /^[a-zA-Z0-9._/-]+$/, // Branch name, ref, or URL path
+      /^https?:\/\/[a-zA-Z0-9][a-zA-Z0-9.-]+\/[a-zA-Z0-9._/-]+\.git$/, // Git HTTPS URL
+      /^git@[a-zA-Z0-9][a-zA-Z0-9.-]+:[a-zA-Z0-9._/-]+\.git$/, // Git SSH URL
+      /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)*$/, // Path
+    ],
+  },
+
+  // Node.js package managers
+  npm: {
+    command: 'npm',
+    description: 'NPM package manager',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^install$/,
+      /^ci$/,
+      /^run$/,
+      /^build$/,
+      /^start$/,
+      /^test$/,
+      /^--production$/,
+      /^--legacy-peer-deps$/,
+      /^--no-audit$/,
+      /^--prefer-offline$/,
+      /^[a-z][a-z0-9_-]*$/, // Script name
+    ],
+  },
+  yarn: {
+    command: 'yarn',
+    description: 'Yarn package manager',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^install$/,
+      /^build$/,
+      /^start$/,
+      /^test$/,
+      /^--production$/,
+      /^--frozen-lockfile$/,
+      /^--prefer-offline$/,
+      /^[a-z][a-z0-9_-]*$/, // Script name
+    ],
+  },
+  pnpm: {
+    command: 'pnpm',
+    description: 'PNPM package manager',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^install$/,
+      /^build$/,
+      /^start$/,
+      /^test$/,
+      /^--prod$/,
+      /^--frozen-lockfile$/,
+      /^[a-z][a-z0-9_-]*$/, // Script name
+    ],
+  },
+
+  // Composer (PHP)
+  composer: {
+    command: 'composer',
+    description: 'PHP Composer',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^install$/,
+      /^update$/,
+      /^dump-autoload$/,
+      /^--no-dev$/,
+      /^--optimize-autoloader$/,
+      /^--no-interaction$/,
+      /^--prefer-dist$/,
+    ],
+  },
+
+  // Bash (for complex commands)
+  bash: {
+    command: 'bash',
+    description: 'Bash shell',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^-c$/,
+      /^cd \/home\/[a-z][a-z0-9_-]{0,31}\/[a-zA-Z0-9._/-]+ && (npm|yarn|pnpm|composer|git) .+$/, // Directory change + command
+    ],
+  },
+
+  // cURL for OPCache clear
+  curl: {
+    command: 'curl',
+    description: 'HTTP client',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^-s$/, // Silent
+      /^-X$/,
+      /^GET$/,
+      /^POST$/,
+      /^http:\/\/127\.0\.0\.1(:\d+)?\/[a-zA-Z0-9._/-]*$/, // Localhost only
+      /^http:\/\/localhost(:\d+)?\/[a-zA-Z0-9._/-]*$/,
+    ],
+  },
+
+  // Symbolic links
+  ln: {
+    command: 'ln',
+    description: 'Create links',
+    requiresSudo: true,
+    allowedArgumentPatterns: [
+      /^-s$/, // Symbolic
+      /^-sf$/, // Symbolic force
+      /^-f$/, // Force
+      /^\/etc\/(apache2|httpd)\/sites-(available|enabled)\/[a-z0-9][a-z0-9.-]{0,253}\.conf$/,
+      /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)*$/,
+    ],
+  },
+
+  // Node.js
+  node: {
+    command: 'node',
+    description: 'Node.js runtime',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^--version$/,
+      /^-v$/,
+      /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)*\.js$/,
     ],
   },
 

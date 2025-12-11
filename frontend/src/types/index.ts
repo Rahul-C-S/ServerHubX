@@ -1,5 +1,6 @@
 export * from './auth';
 export * from './domain';
+export * from './app';
 
 export interface ApiError {
   message: string;

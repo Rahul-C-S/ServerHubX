@@ -19,6 +19,7 @@ import { AuthorizationModule } from './modules/authorization/authorization.modul
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard.js';
 import { SystemUsersModule } from './modules/system-users/system-users.module';
 import { DomainsModule } from './modules/domains/domains.module';
+import { AppsModule } from './modules/apps/apps.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { DomainsModule } from './modules/domains/domains.module';
     AuthorizationModule,
     SystemUsersModule,
     DomainsModule,
+    AppsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
   Globe,
+  Box,
   Database,
   Mail,
   Shield,
@@ -28,6 +29,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
   { icon: Globe, label: 'Domains', href: '/domains' },
+  { icon: Box, label: 'Applications', href: '/apps' },
   { icon: Database, label: 'Databases', href: '/databases' },
   { icon: Mail, label: 'Email', href: '/email' },
   { icon: Shield, label: 'SSL Certificates', href: '/ssl' },
