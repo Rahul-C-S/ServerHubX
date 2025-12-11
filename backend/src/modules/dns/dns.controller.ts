@@ -10,6 +10,7 @@ import {
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { DnsService } from './dns.service.js';
 import { CreateZoneDto, UpdateZoneDto } from './dto/create-zone.dto.js';
 import { CreateRecordDto, UpdateRecordDto } from './dto/create-record.dto.js';
@@ -21,6 +22,8 @@ import type { User } from '../users/entities/user.entity.js';
 import type { DnsZone } from './entities/dns-zone.entity.js';
 import type { DnsRecord } from './entities/dns-record.entity.js';
 
+@ApiTags('DNS')
+@ApiBearerAuth('JWT-auth')
 @Controller('dns')
 @UseGuards(JwtAuthGuard, PoliciesGuard)
 export class DnsController {

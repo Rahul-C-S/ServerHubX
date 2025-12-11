@@ -9,12 +9,15 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CronService } from './cron.service';
 import { CreateCronJobDto, UpdateCronJobDto } from './dto/cron.dto';
 import type { User } from '../users/entities/user.entity';
 
+@ApiTags('Cron')
+@ApiBearerAuth('JWT-auth')
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class CronController {

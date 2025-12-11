@@ -6,6 +6,7 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
@@ -13,6 +14,8 @@ import { UserRole } from '../users/entities/user.entity.js';
 import { SshSecurityService } from './ssh-security.service.js';
 import { ChangeSSHPortDto, UpdateSSHSecurityDto } from './dto/ssh.dto.js';
 
+@ApiTags('SSH')
+@ApiBearerAuth('JWT-auth')
 @Controller('system/ssh')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ROOT_ADMIN)

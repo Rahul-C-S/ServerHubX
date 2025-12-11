@@ -9,6 +9,7 @@ import { MetricsService } from './metrics.service';
 import { AlertEngineService } from './alert-engine.service';
 import { AlertRule } from './entities/alert-rule.entity';
 import { AlertInstance } from './entities/alert-instance.entity';
+import { DefaultAlertRulesSeed } from './seeds/default-alert-rules.seed';
 import { CoreModule } from '../../core/core.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { CoreModule } from '../../core/core.module';
     MetricsService,
     AlertEngineService,
     MonitoringGateway,
+    DefaultAlertRulesSeed,
   ],
   controllers: [MonitoringController],
   exports: [MonitoringService, MetricsService],

@@ -29,6 +29,11 @@ import {
   CronPage,
   FirewallPage,
   SystemInfoPage,
+  LogsPage,
+  SshSecurityPage,
+  NotFoundPage,
+  ForbiddenPage,
+  ServerErrorPage,
 } from '@/pages';
 
 function AppContent() {
@@ -79,13 +84,19 @@ function AppContent() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/firewall" element={<FirewallPage />} />
         <Route path="/system" element={<SystemInfoPage />} />
+        <Route path="/logs" element={<LogsPage />} />
+        <Route path="/ssh" element={<SshSecurityPage />} />
       </Route>
+
+      {/* Error pages */}
+      <Route path="/403" element={<ForbiddenPage />} />
+      <Route path="/500" element={<ServerErrorPage />} />
 
       {/* Redirect root to dashboard */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
       {/* 404 */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

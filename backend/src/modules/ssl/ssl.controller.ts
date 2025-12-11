@@ -9,6 +9,7 @@ import {
   Request,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
@@ -20,6 +21,8 @@ import {
   RenewCertificateDto,
 } from './dto/request-certificate.dto.js';
 
+@ApiTags('SSL')
+@ApiBearerAuth('JWT-auth')
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SslController {

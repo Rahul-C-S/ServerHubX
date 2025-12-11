@@ -10,6 +10,7 @@ import {
   UseGuards,
   Res,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import type { Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -24,6 +25,8 @@ import {
 } from './dto/backups.dto';
 import type { User } from '../users/entities/user.entity';
 
+@ApiTags('Backups')
+@ApiBearerAuth('JWT-auth')
 @Controller('backups')
 @UseGuards(JwtAuthGuard)
 export class BackupsController {

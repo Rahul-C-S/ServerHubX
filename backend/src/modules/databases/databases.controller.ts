@@ -10,6 +10,7 @@ import {
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { DatabasesService } from './databases.service.js';
 import { CreateDatabaseDto } from './dto/create-database.dto.js';
 import { CreateDatabaseUserDto, UpdateDatabaseUserDto } from './dto/create-database-user.dto.js';
@@ -21,6 +22,8 @@ import type { User } from '../users/entities/user.entity.js';
 import type { Database } from './entities/database.entity.js';
 import type { DatabaseUser } from './entities/database-user.entity.js';
 
+@ApiTags('Databases')
+@ApiBearerAuth('JWT-auth')
 @Controller('databases')
 @UseGuards(JwtAuthGuard, PoliciesGuard)
 export class DatabasesController {

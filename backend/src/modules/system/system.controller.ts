@@ -7,6 +7,7 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
@@ -15,6 +16,8 @@ import { SystemInfoService } from './system-info.service.js';
 import { SettingsService } from './settings.service.js';
 import { UpdateSettingDto, UpdateSettingsDto } from './dto/system.dto.js';
 
+@ApiTags('System')
+@ApiBearerAuth('JWT-auth')
 @Controller('system')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SystemController {

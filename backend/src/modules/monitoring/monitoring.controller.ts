@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { MonitoringService } from './monitoring.service';
@@ -21,6 +22,8 @@ import { AlertScope } from './entities/alert-rule.entity';
 import { AlertStatus } from './entities/alert-instance.entity';
 import type { User } from '../users/entities/user.entity';
 
+@ApiTags('Monitoring')
+@ApiBearerAuth('JWT-auth')
 @Controller('monitoring')
 @UseGuards(JwtAuthGuard)
 export class MonitoringController {

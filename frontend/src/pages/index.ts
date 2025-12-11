@@ -15,3 +15,6 @@ export * from './settings';
 export * from './cron';
 export * from './firewall';
 export * from './system';
+export * from './logs';
+export * from './ssh';
+export * from './errors';

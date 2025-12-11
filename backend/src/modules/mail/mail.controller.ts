@@ -11,6 +11,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MailService } from './mail.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
@@ -21,6 +22,8 @@ import { CreateMailDomainDto, UpdateMailDomainDto } from './dto/create-mail-doma
 import { CreateMailboxDto, UpdateMailboxDto } from './dto/create-mailbox.dto.js';
 import { CreateMailAliasDto, UpdateMailAliasDto } from './dto/create-mail-alias.dto.js';
 
+@ApiTags('Mail')
+@ApiBearerAuth('JWT-auth')
 @Controller('mail')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class MailController {

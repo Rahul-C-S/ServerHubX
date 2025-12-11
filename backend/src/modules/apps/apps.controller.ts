@@ -15,6 +15,7 @@ import {
   UseGuards,
   NotFoundException,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AppsService } from './apps.service.js';
 import { DeploymentService } from './services/deployment.service.js';
 import { CreateAppDto } from './dto/create-app.dto.js';
@@ -26,6 +27,8 @@ import { CheckPolicies } from '../authorization/decorators/check-policies.decora
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { User } from '../users/entities/user.entity.js';
 
+@ApiTags('Applications')
+@ApiBearerAuth('JWT-auth')
 @Controller('apps')
 @UseGuards(JwtAuthGuard, PoliciesGuard)
 export class AppsController {

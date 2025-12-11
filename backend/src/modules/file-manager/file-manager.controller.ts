@@ -13,6 +13,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import * as fs from 'fs/promises';
@@ -37,6 +38,8 @@ import {
   DownloadFileDto,
 } from './dto/file-manager.dto.js';
 
+@ApiTags('Files')
+@ApiBearerAuth('JWT-auth')
 @Controller('files')
 export class FileManagerController {
   constructor(private readonly fileManagerService: FileManagerService) {}
