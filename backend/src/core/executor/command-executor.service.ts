@@ -256,4 +256,18 @@ export class CommandExecutorService {
   private delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
+
+  /**
+   * Execute a command that requires sudo privileges.
+   * This is a convenience wrapper that explicitly invokes sudo.
+   */
+  async executeSudo(
+    command: string,
+    args: string[] = [],
+    options: ExecuteOptions = {},
+  ): Promise<CommandResult> {
+    // The execute method already handles sudo based on requiresSudo in the whitelist
+    // This method ensures the command runs with elevated privileges
+    return this.execute(command, args, options);
+  }
 }

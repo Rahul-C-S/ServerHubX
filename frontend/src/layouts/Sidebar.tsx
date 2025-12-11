@@ -15,6 +15,8 @@ import {
   Network,
   Activity,
   Clock,
+  Shield,
+  Cpu,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/uiStore';
@@ -39,6 +41,8 @@ const navItems: NavItem[] = [
   { icon: Activity, label: 'Monitoring', href: '/monitoring' },
   { icon: Clock, label: 'Cron Jobs', href: '/cron' },
   { icon: Terminal, label: 'Terminal', href: '/terminal' },
+  { icon: Shield, label: 'Firewall', href: '/firewall', roles: ['ROOT_ADMIN'] },
+  { icon: Cpu, label: 'System', href: '/system', roles: ['ROOT_ADMIN', 'RESELLER'] },
   { icon: Users, label: 'Users', href: '/users', roles: ['ROOT_ADMIN', 'RESELLER'] },
   { icon: Settings, label: 'Settings', href: '/settings' },
 ];

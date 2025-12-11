@@ -27,6 +27,8 @@ import {
   MonitoringPage,
   SettingsPage,
   CronPage,
+  FirewallPage,
+  SystemInfoPage,
 } from '@/pages';
 
 function AppContent() {
@@ -75,6 +77,8 @@ function AppContent() {
         <Route path="/files" element={<FilesPage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/firewall" element={<FirewallPage />} />
+        <Route path="/system" element={<SystemInfoPage />} />
       </Route>
 
       {/* Redirect root to dashboard */}

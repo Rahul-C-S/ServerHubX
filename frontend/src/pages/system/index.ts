@@ -1,0 +1,1 @@
+export { SystemInfoPage } from './SystemInfoPage';

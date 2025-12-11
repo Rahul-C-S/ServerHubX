@@ -30,6 +30,7 @@ import { BackupsModule } from './modules/backups/backups.module';
 import { MonitoringModule } from './modules/monitoring/monitoring.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { CronModule } from './modules/cron/cron.module';
+import { SystemModule } from './modules/system/system.module';
 
 @Module({
   imports: [
@@ -87,6 +88,7 @@ import { CronModule } from './modules/cron/cron.module';
     MonitoringModule,
     NotificationsModule,
     CronModule,
+    SystemModule,
   ],
   controllers: [AppController],
   providers: [

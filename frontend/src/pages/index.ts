@@ -13,3 +13,5 @@ export * from './backups';
 export * from './monitoring';
 export * from './settings';
 export * from './cron';
+export * from './firewall';
+export * from './system';

@@ -196,6 +196,9 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^-p$/, // Preserve
       /^-a$/, // Archive
       /^\/home\/[a-z][a-z0-9_-]{0,31}(\/[a-zA-Z0-9._-]+)*$/,
+      /^\/tmp\/[a-z][a-z0-9._-]+$/, // Temp files
+      /^\/etc\/csf\/csf\.(conf|allow|deny|ignore)$/, // CSF config files
+      /^\/etc\/ssh\/sshd_config$/, // SSH config
     ],
   },
   mv: {
@@ -459,6 +462,65 @@ export const COMMAND_WHITELIST: Record<string, CommandDefinition> = {
       /^-p$/, // Process
       /^-tlnp$/, // Combined
       /^sport = :\d+$/, // Source port filter
+    ],
+  },
+
+  // SSH daemon
+  sshd: {
+    command: 'sshd',
+    description: 'SSH daemon',
+    requiresSudo: true,
+    allowedArgumentPatterns: [
+      /^-t$/, // Test configuration
+      /^-T$/, // Extended test mode
+    ],
+  },
+
+  // Hostname
+  hostname: {
+    command: 'hostname',
+    description: 'Show or set hostname',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^-f$/, // FQDN
+      /^-s$/, // Short name
+      /^-d$/, // Domain name
+    ],
+  },
+
+  // Disk usage
+  df: {
+    command: 'df',
+    description: 'Disk free space',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^-h$/, // Human readable
+      /^-B1$/, // Block size 1 byte
+      /^--output=.+$/, // Output format
+      /^\/$/, // Root filesystem
+      /^\/home$/, // Home filesystem
+    ],
+  },
+
+  // Package management (apt)
+  apt: {
+    command: 'apt',
+    description: 'APT package manager',
+    requiresSudo: true,
+    allowedArgumentPatterns: [
+      /^update$/, // Update package lists
+      /^list$/, // List packages
+      /^--upgradable$/, // Upgradable packages
+    ],
+  },
+
+  // Package management (dnf)
+  dnf: {
+    command: 'dnf',
+    description: 'DNF package manager',
+    requiresSudo: false,
+    allowedArgumentPatterns: [
+      /^check-update$/, // Check for updates
     ],
   },
 
