@@ -3,6 +3,8 @@ node_modules
 
 # Build output
 dist
+build
+.next
 
 # Logs
 logs
@@ -16,16 +18,19 @@ pnpm-debug.log*
 .env
 .env.local
 .env.*.local
+!.env.example
 
 # IDE
 .idea
 .vscode
 *.swp
 *.swo
+*.sublime-*
 
 # OS
 .DS_Store
 Thumbs.db
+*.DS_Store
 
 # Test
 coverage
@@ -35,3 +40,8 @@ coverage
 tmp
 temp
 *.tmp
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
