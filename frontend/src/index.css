@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Primary - Blue */
+    --color-primary-50: 239 246 255;
+    --color-primary-100: 219 234 254;
+    --color-primary-200: 191 219 254;
+    --color-primary-300: 147 197 253;
+    --color-primary-400: 96 165 250;
+    --color-primary-500: 59 130 246;
+    --color-primary-600: 37 99 235;
+    --color-primary-700: 29 78 216;
+    --color-primary-800: 30 64 175;
+    --color-primary-900: 30 58 138;
+    --color-primary-950: 23 37 84;
+
+    /* Surface - Gray */
+    --color-surface-50: 249 250 251;
+    --color-surface-100: 243 244 246;
+    --color-surface-200: 229 231 235;
+    --color-surface-300: 209 213 219;
+    --color-surface-400: 156 163 175;
+    --color-surface-500: 107 114 128;
+    --color-surface-600: 75 85 99;
+    --color-surface-700: 55 65 81;
+    --color-surface-800: 31 41 55;
+    --color-surface-900: 17 24 39;
+    --color-surface-950: 3 7 18;
+  }
+
+  .dark {
+    /* Primary - Blue (slightly lighter for dark mode) */
+    --color-primary-50: 23 37 84;
+    --color-primary-100: 30 58 138;
+    --color-primary-200: 30 64 175;
+    --color-primary-300: 29 78 216;
+    --color-primary-400: 37 99 235;
+    --color-primary-500: 59 130 246;
+    --color-primary-600: 96 165 250;
+    --color-primary-700: 147 197 253;
+    --color-primary-800: 191 219 254;
+    --color-primary-900: 219 234 254;
+    --color-primary-950: 239 246 255;
+
+    /* Surface - Dark Gray */
+    --color-surface-50: 3 7 18;
+    --color-surface-100: 17 24 39;
+    --color-surface-200: 31 41 55;
+    --color-surface-300: 55 65 81;
+    --color-surface-400: 75 85 99;
+    --color-surface-500: 107 114 128;
+    --color-surface-600: 156 163 175;
+    --color-surface-700: 209 213 219;
+    --color-surface-800: 229 231 235;
+    --color-surface-900: 243 244 246;
+    --color-surface-950: 249 250 251;
+  }
+
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-surface-50 text-surface-900 dark:bg-surface-950 dark:text-surface-50 m-0;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-200 text-surface-900 hover:bg-surface-300 focus:ring-surface-400 dark:bg-surface-700 dark:text-surface-100 dark:hover:bg-surface-600;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-surface-100 dark:hover:bg-surface-800 focus:ring-surface-400;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+
+  .btn-md {
+    @apply px-4 py-2 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  .input {
+    @apply block w-full rounded-lg border border-surface-300 bg-white px-3 py-2 text-surface-900 placeholder:text-surface-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 disabled:bg-surface-100 disabled:cursor-not-allowed dark:border-surface-600 dark:bg-surface-800 dark:text-surface-100 dark:placeholder:text-surface-500 dark:focus:border-primary-400;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1;
+  }
+
+  .card {
+    @apply bg-white rounded-xl border border-surface-200 shadow-sm dark:bg-surface-900 dark:border-surface-700;
+  }
+}
