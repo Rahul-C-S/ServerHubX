@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Domain } from '../../domains/entities/domain.entity';
-import { Backup, BackupType, StorageType } from './backup.entity';
+import { BackupType, StorageType } from './backup.types';
 
 @Entity('backup_schedules')
 export class BackupSchedule {
@@ -96,8 +96,8 @@ export class BackupSchedule {
   @Column({ name: 'domain_id' })
   domainId!: string;
 
-  @OneToMany(() => Backup, (backup) => backup.schedule)
-  backups!: Backup[];
+  @OneToMany('Backup', 'schedule')
+  backups!: any[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

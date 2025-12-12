@@ -8,28 +8,10 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Domain } from '../../domains/entities/domain.entity';
-import { BackupSchedule } from './backup-schedule.entity';
+import { BackupType, BackupStatus, StorageType } from './backup.types';
 
-export enum BackupType {
-  FULL = 'full',
-  FILES = 'files',
-  DATABASE = 'database',
-  INCREMENTAL = 'incremental',
-}
-
-export enum BackupStatus {
-  PENDING = 'pending',
-  IN_PROGRESS = 'in_progress',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled',
-}
-
-export enum StorageType {
-  LOCAL = 'local',
-  S3 = 's3',
-  SFTP = 'sftp',
-}
+// Re-export types for backward compatibility
+export { BackupType, BackupStatus, StorageType } from './backup.types';
 
 @Entity('backups')
 export class Backup {
@@ -92,12 +74,12 @@ export class Backup {
   @Column({ name: 'domain_id' })
   domainId!: string;
 
-  @ManyToOne(() => BackupSchedule, (schedule) => schedule.backups, {
+  @ManyToOne('BackupSchedule', 'backups', {
     nullable: true,
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'schedule_id' })
-  schedule?: BackupSchedule;
+  schedule?: any;
 
   @Column({ name: 'schedule_id', nullable: true })
   scheduleId?: string;
