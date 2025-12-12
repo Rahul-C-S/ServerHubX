@@ -1,10 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import * as os from 'os';
 import * as fs from 'fs/promises';
 import { CommandExecutorService } from '../../core/executor/command-executor.service';
+import { REDIS_CLIENT } from '../../common/redis/redis.module';
 
 export interface SystemMetrics {
   timestamp: number;
@@ -66,7 +66,7 @@ export class MetricsService {
   private previousNetworkStats: Map<string, { bytesIn: number; bytesOut: number }> = new Map();
 
   constructor(
-    @InjectRedis() private readonly redis: Redis,
+    @Inject(REDIS_CLIENT) private readonly redis: Redis,
     private readonly commandExecutor: CommandExecutorService,
   ) {}
 
