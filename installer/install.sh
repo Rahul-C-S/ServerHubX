@@ -1103,18 +1103,101 @@ EOF
     log_success "Sudo rules configured"
 }
 
+ensure_swap() {
+    # Check if swap exists and is sufficient
+    local swap_size=$(free -m | awk '/^Swap:/{print $2}')
+    local ram_size=$(free -m | awk '/^Mem:/{print $2}')
+
+    if [ "$swap_size" -lt 1024 ] && [ "$ram_size" -lt 2048 ]; then
+        log_info "Low memory detected (${ram_size}MB RAM, ${swap_size}MB swap). Creating swap file..."
+
+        # Create 2GB swap file if it doesn't exist
+        if [ ! -f /swapfile ]; then
+            fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048 2>/dev/null
+            chmod 600 /swapfile
+            mkswap /swapfile >/dev/null 2>&1
+            swapon /swapfile 2>/dev/null || true
+
+            # Add to fstab for persistence
+            if ! grep -q '/swapfile' /etc/fstab; then
+                echo '/swapfile none swap sw 0 0' >> /etc/fstab
+            fi
+            log_success "Created 2GB swap file"
+        else
+            swapon /swapfile 2>/dev/null || true
+        fi
+    fi
+}
+
+verify_dependencies() {
+    log_info "Verifying required services..."
+    local all_ok=true
+
+    # Check MariaDB
+    if ! systemctl is-active --quiet mariadb; then
+        log_warning "MariaDB is not running. Attempting to start..."
+        systemctl start mariadb 2>/dev/null || {
+            log_error "Failed to start MariaDB"
+            all_ok=false
+        }
+    fi
+
+    # Check Redis
+    if ! systemctl is-active --quiet redis-server && ! systemctl is-active --quiet redis; then
+        log_warning "Redis is not running. Attempting to start..."
+        systemctl start redis-server 2>/dev/null || systemctl start redis 2>/dev/null || {
+            log_warning "Failed to start Redis (may not be critical)"
+        }
+    fi
+
+    # Verify MariaDB is accessible
+    if systemctl is-active --quiet mariadb; then
+        if [ -f /root/.serverhubx-credentials ]; then
+            local db_root_password=$(grep MARIADB_ROOT_PASSWORD /root/.serverhubx-credentials 2>/dev/null | cut -d= -f2)
+            if [ -n "$db_root_password" ]; then
+                if mysql -u root -p"${db_root_password}" -e "SELECT 1" >/dev/null 2>&1; then
+                    log_success "MariaDB connection verified"
+                else
+                    log_warning "Cannot connect to MariaDB with stored credentials"
+                fi
+            fi
+        fi
+    fi
+
+    # Show service status
+    log_info "Service status:"
+    systemctl is-active --quiet mariadb && echo "  MariaDB: running" || echo "  MariaDB: not running"
+    (systemctl is-active --quiet redis-server || systemctl is-active --quiet redis) && echo "  Redis: running" || echo "  Redis: not running"
+
+    if [ "$all_ok" = false ]; then
+        return 1
+    fi
+    return 0
+}
+
 install_serverhubx() {
     log_step "Installing ServerHubX application..."
 
+    # Ensure sufficient memory for build
+    ensure_swap
+
     local app_installed=false
 
-    if [ "$DEV_MODE" = true ]; then
+    # Remove existing installation if present
+    if [ -d "$SERVERHUBX_HOME" ] && [ -d "$SERVERHUBX_HOME/.git" ]; then
+        log_info "Existing installation found. Updating..."
+        cd "$SERVERHUBX_HOME"
+        git fetch origin 2>&1 || true
+        git reset --hard origin/main 2>&1 || true
+        app_installed=true
+    elif [ "$DEV_MODE" = true ]; then
         # For development, copy from current directory to SERVERHUBX_HOME
         log_info "Development mode: copying from current directory..."
         local current_dir=$(pwd)
 
         # Check if we're in a directory with backend/frontend
         if [ -d "$current_dir/backend" ] || [ -d "$current_dir/frontend" ]; then
+            rm -rf "$SERVERHUBX_HOME" 2>/dev/null || true
             mkdir -p "$SERVERHUBX_HOME"
             cp -r "$current_dir"/* "$SERVERHUBX_HOME"/ 2>/dev/null || true
             cp -r "$current_dir"/.* "$SERVERHUBX_HOME"/ 2>/dev/null || true
@@ -1126,6 +1209,7 @@ install_serverhubx() {
     else
         # Clone repository
         log_info "Cloning ServerHubX repository..."
+        rm -rf "$SERVERHUBX_HOME" 2>/dev/null || true
         if git clone "$SERVERHUBX_REPO" "$SERVERHUBX_HOME" 2>&1; then
             app_installed=true
             log_success "Repository cloned successfully"
@@ -1148,14 +1232,35 @@ install_serverhubx() {
 
     cd "$SERVERHUBX_HOME"
 
+    # Set NODE_OPTIONS for memory management during builds
+    export NODE_OPTIONS="--max-old-space-size=2048"
+
     # Install backend dependencies
     if [ -d "backend" ] && [ -f "backend/package.json" ]; then
         log_info "Installing backend dependencies..."
         cd backend
-        npm ci 2>&1 || npm install 2>&1 || log_warning "Backend npm install failed"
+
+        # Install dependencies
+        if ! npm ci --legacy-peer-deps 2>&1; then
+            log_warning "npm ci failed, trying npm install..."
+            npm install --legacy-peer-deps 2>&1 || {
+                log_error "Backend npm install failed"
+                cd ..
+                return 1
+            }
+        fi
+
+        # Build backend
         if [ -f "package.json" ] && grep -q '"build"' package.json; then
-            log_info "Building backend..."
-            npm run build 2>&1 || log_warning "Backend build failed"
+            log_info "Building backend (this may take a few minutes)..."
+            if ! npm run build 2>&1; then
+                log_error "Backend build failed. Check memory and try manually:"
+                log_info "  cd $SERVERHUBX_HOME/backend"
+                log_info "  NODE_OPTIONS='--max-old-space-size=4096' npm run build"
+                cd ..
+                return 1
+            fi
+            log_success "Backend built successfully"
         fi
         cd ..
     else
@@ -1166,72 +1271,143 @@ install_serverhubx() {
     if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
         log_info "Installing frontend dependencies..."
         cd frontend
-        npm ci 2>&1 || npm install 2>&1 || log_warning "Frontend npm install failed"
+
+        # Install dependencies
+        if ! npm ci --legacy-peer-deps 2>&1; then
+            log_warning "npm ci failed, trying npm install..."
+            npm install --legacy-peer-deps 2>&1 || {
+                log_error "Frontend npm install failed"
+                cd ..
+                return 1
+            }
+        fi
+
+        # Build frontend
         if [ -f "package.json" ] && grep -q '"build"' package.json; then
-            log_info "Building frontend..."
-            npm run build 2>&1 || log_warning "Frontend build failed"
+            log_info "Building frontend (this may take a few minutes)..."
+            if ! npm run build 2>&1; then
+                log_error "Frontend build failed. Check memory and try manually:"
+                log_info "  cd $SERVERHUBX_HOME/frontend"
+                log_info "  NODE_OPTIONS='--max-old-space-size=4096' npm run build"
+                cd ..
+                return 1
+            fi
+            log_success "Frontend built successfully"
         fi
         cd ..
     else
         log_warning "No frontend/package.json found"
     fi
 
+    # Verify backend build exists
+    if [ ! -f "backend/dist/main.js" ]; then
+        log_error "Backend build not found at backend/dist/main.js"
+        log_info "The application build may have failed."
+        return 1
+    fi
+
     # Set ownership
     chown -R "$SERVERHUBX_USER:$SERVERHUBX_USER" "$SERVERHUBX_HOME"
 
-    log_success "ServerHubX installed to $SERVERHUBX_HOME"
+    log_success "ServerHubX installed and built successfully"
 }
 
 create_database() {
     log_step "Creating ServerHubX database..."
 
-    local db_password=$(generate_password)
-    local db_root_password=$(grep MARIADB_ROOT_PASSWORD /root/.serverhubx-credentials | cut -d= -f2)
+    # Check if MariaDB is running
+    if ! systemctl is-active --quiet mariadb; then
+        log_info "Starting MariaDB..."
+        systemctl start mariadb || {
+            log_error "Failed to start MariaDB"
+            return 1
+        }
+    fi
 
-    mysql -u root -p"${db_root_password}" << EOF
-CREATE DATABASE IF NOT EXISTS ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${db_password}';
-GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
-FLUSH PRIVILEGES;
-EOF
+    # Check if credentials file exists
+    if [ ! -f /root/.serverhubx-credentials ]; then
+        log_error "Credentials file not found. MariaDB may not have been installed correctly."
+        return 1
+    fi
+
+    local db_password=$(generate_password)
+    local db_root_password=$(grep MARIADB_ROOT_PASSWORD /root/.serverhubx-credentials 2>/dev/null | cut -d= -f2)
+
+    if [ -z "$db_root_password" ]; then
+        log_error "MariaDB root password not found in credentials file"
+        return 1
+    fi
+
+    log_info "Creating database and user..."
+    if mysql -u root -p"${db_root_password}" -e "
+        CREATE DATABASE IF NOT EXISTS ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${db_password}';
+        GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
+        FLUSH PRIVILEGES;
+    " 2>&1; then
+        log_success "Database and user created"
+    else
+        log_error "Failed to create database. Check MariaDB credentials."
+        return 1
+    fi
 
     # Save database credentials
     echo "SERVERHUBX_DB_NAME=${DB_NAME}" >> /root/.serverhubx-credentials
     echo "SERVERHUBX_DB_USER=${DB_USER}" >> /root/.serverhubx-credentials
     echo "SERVERHUBX_DB_PASSWORD=${db_password}" >> /root/.serverhubx-credentials
 
-    log_success "Database created"
+    log_success "Database configured"
 }
 
 create_env_file() {
     log_step "Creating environment configuration..."
 
-    local db_password=$(grep SERVERHUBX_DB_PASSWORD /root/.serverhubx-credentials | cut -d= -f2)
-    local jwt_secret=$(generate_password)
+    # Check if credentials file exists
+    if [ ! -f /root/.serverhubx-credentials ]; then
+        log_error "Credentials file not found. Cannot create .env file."
+        return 1
+    fi
+
+    local db_password=$(grep SERVERHUBX_DB_PASSWORD /root/.serverhubx-credentials 2>/dev/null | cut -d= -f2)
+    if [ -z "$db_password" ]; then
+        log_error "Database password not found in credentials file"
+        return 1
+    fi
+
+    # Generate JWT secret (must be at least 32 characters)
+    local jwt_secret=$(openssl rand -base64 48 | tr -dc 'a-zA-Z0-9' | head -c 64)
     local encryption_key=$(openssl rand -hex 32)
 
+    # Create backend .env file with correct variable names for the NestJS app
     cat > "${SERVERHUBX_HOME}/backend/.env" << EOF
 # ServerHubX Environment Configuration
 # Generated on $(date)
 
+# Application
 NODE_ENV=production
 PORT=${SERVERHUBX_PORT}
+APP_NAME=ServerHubX
+APP_URL=https://$(get_server_ip):${SERVERHUBX_PORT}
 
-# Database
-DATABASE_HOST=localhost
-DATABASE_PORT=3306
-DATABASE_NAME=${DB_NAME}
-DATABASE_USER=${DB_USER}
-DATABASE_PASSWORD=${db_password}
+# Database (MariaDB) - Variable names must match backend validation
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=${DB_USER}
+DB_PASSWORD=${db_password}
+DB_DATABASE=${DB_NAME}
+DB_SYNCHRONIZE=true
+DB_LOGGING=false
 
 # Redis
 REDIS_HOST=localhost
 REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
 
-# JWT
+# JWT - Secret must be at least 32 characters
 JWT_SECRET=${jwt_secret}
-JWT_EXPIRES_IN=15m
-JWT_REFRESH_EXPIRES_IN=7d
+JWT_ACCESS_EXPIRY=15m
+JWT_REFRESH_EXPIRY=7d
 
 # Encryption
 ENCRYPTION_KEY=${encryption_key}
@@ -1239,12 +1415,34 @@ ENCRYPTION_KEY=${encryption_key}
 # Server
 SERVER_IP=$(get_server_ip)
 SSH_PORT=${SSH_PORT}
+
+# Logging
+LOG_LEVEL=info
+LOG_DIR=/var/log/serverhubx
 EOF
 
+    # Create log directory
+    mkdir -p /var/log/serverhubx
+    chown "$SERVERHUBX_USER:$SERVERHUBX_USER" /var/log/serverhubx
+
+    # Set proper ownership and permissions
     chown "$SERVERHUBX_USER:$SERVERHUBX_USER" "${SERVERHUBX_HOME}/backend/.env"
     chmod 600 "${SERVERHUBX_HOME}/backend/.env"
 
-    log_success "Environment configuration created"
+    # Verify the .env file was created and has required variables
+    if [ -f "${SERVERHUBX_HOME}/backend/.env" ]; then
+        if grep -q "DB_USERNAME" "${SERVERHUBX_HOME}/backend/.env" && \
+           grep -q "DB_PASSWORD" "${SERVERHUBX_HOME}/backend/.env" && \
+           grep -q "DB_DATABASE" "${SERVERHUBX_HOME}/backend/.env" && \
+           grep -q "JWT_SECRET" "${SERVERHUBX_HOME}/backend/.env"; then
+            log_success "Environment configuration created with all required variables"
+        else
+            log_warning "Environment file created but may be missing some variables"
+        fi
+    else
+        log_error "Failed to create .env file"
+        return 1
+    fi
 }
 
 create_systemd_service() {
@@ -1253,18 +1451,40 @@ create_systemd_service() {
     cat > /etc/systemd/system/serverhubx.service << EOF
 [Unit]
 Description=ServerHubX Hosting Control Panel
+Documentation=https://github.com/Rahul-C-S/ServerHubX
 After=network.target mariadb.service redis.service
+Wants=mariadb.service redis.service
 
 [Service]
 Type=simple
 User=${SERVERHUBX_USER}
+Group=${SERVERHUBX_USER}
 WorkingDirectory=${SERVERHUBX_HOME}/backend
 ExecStart=/usr/bin/node dist/main.js
 Restart=on-failure
 RestartSec=10
+
+# Limit restart attempts to prevent infinite loops
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# Resource limits
+LimitNOFILE=65535
+LimitNPROC=4096
+
+# Environment
+Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--max-old-space-size=512
+EnvironmentFile=-${SERVERHUBX_HOME}/backend/.env
+
+# Logging
 StandardOutput=journal
 StandardError=journal
-Environment=NODE_ENV=production
+SyslogIdentifier=serverhubx
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target
@@ -1313,6 +1533,9 @@ create_admin_user() {
 start_serverhubx() {
     log_step "Starting ServerHubX..."
 
+    # Verify required services are running
+    verify_dependencies || log_warning "Some dependencies may not be running"
+
     # Start Apache
     systemctl restart apache2 2>/dev/null || systemctl restart httpd 2>/dev/null || true
 
@@ -1333,6 +1556,37 @@ start_serverhubx() {
         return 1
     fi
 
+    # Pre-start validation: Check .env file exists and has required variables
+    local env_file="${SERVERHUBX_HOME}/backend/.env"
+    if [ ! -f "$env_file" ]; then
+        log_error ".env file not found at $env_file"
+        log_info "Creating environment file..."
+        create_env_file || {
+            log_error "Failed to create .env file. Cannot start service."
+            return 1
+        }
+    fi
+
+    # Validate required environment variables
+    local missing_vars=""
+    for var in DB_USERNAME DB_PASSWORD DB_DATABASE JWT_SECRET; do
+        if ! grep -q "^${var}=" "$env_file" 2>/dev/null; then
+            missing_vars="$missing_vars $var"
+        fi
+    done
+
+    if [ -n "$missing_vars" ]; then
+        log_error "Missing required environment variables:$missing_vars"
+        log_info "Please check $env_file"
+        return 1
+    fi
+
+    # Reset systemd failure counter before starting
+    systemctl reset-failed serverhubx 2>/dev/null || true
+
+    # Stop service if running
+    systemctl stop serverhubx 2>/dev/null || true
+
     # Start ServerHubX
     log_info "Starting ServerHubX service..."
     systemctl start serverhubx
@@ -1342,9 +1596,24 @@ start_serverhubx() {
 
     if systemctl is-active --quiet serverhubx; then
         log_success "ServerHubX started successfully"
+
+        # Show port the service is listening on
+        log_info "Dashboard should be accessible at: https://$(get_server_ip):${SERVERHUBX_PORT}"
     else
-        log_error "ServerHubX failed to start. Check logs: journalctl -u serverhubx"
-        log_info "You can try manually: cd ${SERVERHUBX_HOME}/backend && node dist/main.js"
+        log_error "ServerHubX failed to start"
+        log_info ""
+        log_info "Diagnostic information:"
+        log_info "========================"
+
+        # Show last few lines of journal
+        log_info "Recent logs:"
+        journalctl -u serverhubx -n 10 --no-pager 2>/dev/null || true
+
+        log_info ""
+        log_info "To debug manually:"
+        log_info "  1. Check logs: journalctl -u serverhubx -f"
+        log_info "  2. Test manually: cd ${SERVERHUBX_HOME}/backend && node dist/main.js"
+        log_info "  3. Check .env: cat ${SERVERHUBX_HOME}/backend/.env"
         return 1
     fi
 }

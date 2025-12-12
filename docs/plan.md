@@ -1482,13 +1482,15 @@ Both should return your server's IP address.
   - [x] Implement setup_sudo_rules()
   - [x] Implement install_serverhubx()
   - [x] Implement create_database()
-  - [x] Implement create_env_file()
-  - [x] Implement create_systemd_service()
+  - [x] Implement create_env_file() (fixed: uses correct variable names DB_USERNAME, DB_PASSWORD, DB_DATABASE, JWT_SECRET)
+  - [x] Implement create_systemd_service() (improved: restart limits, resource limits, security settings)
   - [x] Implement generate_ssl_cert()
   - [x] Implement create_admin_user()
-  - [x] Implement start_serverhubx()
+  - [x] Implement start_serverhubx() (improved: pre-start validation, dependency verification, diagnostics)
   - [x] Implement print_summary()
   - [x] Implement show_dns_instructions()
+  - [x] Implement ensure_swap() for low-memory servers
+  - [x] Implement verify_dependencies() to check MariaDB/Redis before starting
 
 - [x] **Uninstall Script**
   - [x] Create `installer/uninstall.sh`
