@@ -14,7 +14,11 @@
 #   --dev           Development mode (use local repo)
 #
 
-set -e
+# Don't use set -e as we want to continue on errors and show summary
+# set -e
+
+# Track installation status
+INSTALL_ERRORS=0
 
 # ============================================================================
 # Configuration
@@ -24,7 +28,7 @@ SERVERHUBX_VERSION="1.0.0"
 SERVERHUBX_USER="serverhubx"
 SERVERHUBX_HOME="/opt/serverhubx"
 SERVERHUBX_PORT="${SERVERHUBX_PORT:-3000}"
-SERVERHUBX_REPO="https://github.com/your-org/serverhubx.git"
+SERVERHUBX_REPO="https://github.com/Rahul-C-S/ServerHubX.git"
 
 SSH_PORT="${SSH_PORT:-8130}"
 DB_NAME="serverhubx"
@@ -170,8 +174,8 @@ check_resources() {
 
     # Check RAM (minimum 1GB, recommended 2GB)
     local total_ram=$(free -m | awk '/^Mem:/{print $2}')
-    if [ "$total_ram" -lt 1024 ]; then
-        log_error "Insufficient RAM: ${total_ram}MB (minimum 1024MB required)"
+    if [ "$total_ram" -lt 512 ]; then
+        log_error "Insufficient RAM: ${total_ram}MB (minimum 512MB required)"
         exit 1
     elif [ "$total_ram" -lt 2048 ]; then
         log_warning "Low RAM: ${total_ram}MB (2048MB recommended)"
@@ -315,16 +319,111 @@ install_php() {
     log_step "Installing PHP versions (7.4, 8.0, 8.1, 8.2, 8.3)..."
 
     if [ "$PKG_MANAGER" = "apt" ]; then
-        # Add Ondrej PHP repository
-        add-apt-repository -y ppa:ondrej/php 2>/dev/null || {
+        # Determine the correct codename for PHP repository
+        local codename=$(lsb_release -sc 2>/dev/null || echo "unknown")
+        local php_codename="$codename"
+
+        # Map unsupported Ubuntu versions to nearest supported LTS
+        # Ondrej PPA supports: focal (20.04), jammy (22.04), noble (24.04)
+        case "$codename" in
+            noble|jammy|focal)
+                # Supported versions, use as-is
+                php_codename="$codename"
+                ;;
+            *)
+                # Unsupported version - map based on version number
+                if [[ "$OS_ID" == "ubuntu" ]]; then
+                    local version_major=$(echo "$OS_VERSION" | cut -d. -f1)
+                    if [[ "$version_major" -ge 25 ]]; then
+                        php_codename="noble"
+                        log_info "Ubuntu $OS_VERSION ($codename) detected, using PHP repository for noble (24.04)"
+                    elif [[ "$version_major" -ge 23 ]]; then
+                        php_codename="jammy"
+                        log_info "Ubuntu $OS_VERSION ($codename) detected, using PHP repository for jammy (22.04)"
+                    elif [[ "$version_major" -ge 21 ]]; then
+                        php_codename="focal"
+                        log_info "Ubuntu $OS_VERSION ($codename) detected, using PHP repository for focal (20.04)"
+                    else
+                        php_codename="focal"
+                        log_warning "Ubuntu $OS_VERSION may not be fully supported, trying focal repository"
+                    fi
+                fi
+                ;;
+        esac
+
+        if [ "$OS_ID" = "ubuntu" ]; then
+            # For Ubuntu, manually add ondrej/php with correct codename
+            log_info "Adding ondrej/php repository for $php_codename..."
+
+            # Remove any existing ondrej/php sources (from previous add-apt-repository runs)
+            # This includes both old .list format and new DEB822 .sources format
+            log_info "Cleaning up any existing PHP repository configurations..."
+            rm -f /etc/apt/sources.list.d/ondrej-*.list 2>/dev/null || true
+            rm -f /etc/apt/sources.list.d/ondrej-*.sources 2>/dev/null || true
+            rm -f /etc/apt/sources.list.d/*ondrej*.list 2>/dev/null || true
+            rm -f /etc/apt/sources.list.d/*ondrej*.sources 2>/dev/null || true
+            rm -f /etc/apt/sources.list.d/ondrej-ubuntu-php-*.list 2>/dev/null || true
+            rm -f /etc/apt/sources.list.d/ondrej-ubuntu-php-*.sources 2>/dev/null || true
+            # Also check for ppa format naming
+            rm -f /etc/apt/sources.list.d/ppa_ondrej_php*.list 2>/dev/null || true
+            rm -f /etc/apt/sources.list.d/ppa_ondrej_php*.sources 2>/dev/null || true
+
+            # Add GPG key using multiple methods for reliability
+            mkdir -p /usr/share/keyrings
+            local gpg_key_added=false
+
+            # Method 1: Direct download from Launchpad
+            if curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c" 2>/dev/null | gpg --batch --yes --dearmor -o /usr/share/keyrings/ondrej-php.gpg 2>/dev/null; then
+                gpg_key_added=true
+                log_info "GPG key added via keyserver"
+            fi
+
+            # Method 2: Try apt-key as fallback (deprecated but reliable)
+            if [ "$gpg_key_added" = false ]; then
+                if apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4F4EA0AAE5267A6C 2>/dev/null; then
+                    gpg_key_added=true
+                    log_info "GPG key added via apt-key"
+                    # Use without signed-by since key is in apt-key
+                    echo "deb https://ppa.launchpadcontent.net/ondrej/php/ubuntu ${php_codename} main" > /etc/apt/sources.list.d/ondrej-php.list
+                fi
+            fi
+
+            # Method 3: Download key from PPA directly
+            if [ "$gpg_key_added" = false ]; then
+                log_info "Trying alternative GPG key source..."
+                curl -fsSL "https://packages.sury.org/php/apt.gpg" 2>/dev/null | gpg --batch --yes --dearmor -o /usr/share/keyrings/ondrej-php.gpg 2>/dev/null && gpg_key_added=true
+            fi
+
+            if [ "$gpg_key_added" = false ]; then
+                log_error "Failed to add GPG key for PHP repository"
+                log_info "Attempting installation without GPG verification..."
+            fi
+
+            # Add repository with correct codename (only if not already added by apt-key method)
+            if [ ! -f /etc/apt/sources.list.d/ondrej-php.list ]; then
+                echo "deb [signed-by=/usr/share/keyrings/ondrej-php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu ${php_codename} main" > /etc/apt/sources.list.d/ondrej-php.list
+            fi
+
+            # Update apt and show any errors
+            log_info "Updating package lists..."
+            if ! apt-get update 2>&1 | grep -i "err\|failed"; then
+                log_success "Repository configured successfully"
+            else
+                log_warning "Repository update had issues, attempting to continue..."
+            fi
+        else
             # For Debian, add sury.org repository
             curl -sSL https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /usr/share/keyrings/sury-php.gpg
             echo "deb [signed-by=/usr/share/keyrings/sury-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/sury-php.list
             apt-get update -qq
-        }
+        fi
 
-        for version in 7.4 8.0 8.1 8.2 8.3; do
-            apt-get install -y -qq \
+        local php_installed=false
+
+        # Try installing PHP versions from ondrej PPA
+        for version in 8.3 8.2 8.1 8.0 7.4; do
+            log_info "Attempting to install PHP $version..."
+            if apt-get install -y \
                 php${version}-fpm \
                 php${version}-cli \
                 php${version}-common \
@@ -337,10 +436,50 @@ install_php() {
                 php${version}-zip \
                 php${version}-bcmath \
                 php${version}-intl \
-                php${version}-soap \
-                php${version}-redis \
-                php${version}-imagick 2>/dev/null || log_warning "Some PHP $version packages not available"
+                php${version}-soap 2>&1; then
+                log_success "PHP $version installed successfully"
+                php_installed=true
+                # Try optional extensions separately (they may not exist)
+                apt-get install -y php${version}-redis php${version}-imagick 2>/dev/null || true
+            else
+                log_warning "PHP $version installation failed"
+            fi
         done
+
+        # Fallback: Try Ubuntu's native PHP packages if ondrej PPA failed
+        if [ "$php_installed" = false ]; then
+            log_warning "Ondrej PPA packages not available. Trying system PHP packages..."
+
+            # Remove ondrej sources and try native packages
+            rm -f /etc/apt/sources.list.d/ondrej-php.list 2>/dev/null || true
+            apt-get update -qq
+
+            if apt-get install -y \
+                php-fpm \
+                php-cli \
+                php-common \
+                php-mysql \
+                php-pgsql \
+                php-curl \
+                php-gd \
+                php-mbstring \
+                php-xml \
+                php-zip \
+                php-bcmath \
+                php-intl 2>&1; then
+                log_success "System PHP packages installed"
+                php_installed=true
+                apt-get install -y php-redis php-imagick 2>/dev/null || true
+            fi
+        fi
+
+        # Verify PHP is installed
+        if command -v php &>/dev/null; then
+            log_success "PHP $(php -v | head -1 | cut -d' ' -f2) is available"
+        else
+            log_error "PHP installation failed completely."
+            log_info "Manual installation required. Try: apt-get install php-fpm php-cli"
+        fi
 
     else
         # Add Remi repository for RHEL
@@ -367,10 +506,17 @@ install_php() {
         done
     fi
 
-    # Install Composer
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-    log_success "PHP versions installed"
+    # Install Composer (only if PHP is available)
+    if command -v php &>/dev/null; then
+        log_info "Installing Composer..."
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer 2>/dev/null || {
+            log_warning "Composer installation failed. You can install it manually later."
+        }
+        log_success "PHP versions installed"
+    else
+        log_warning "PHP not found. Composer installation skipped."
+        log_warning "PHP installation may have failed. Please check and install PHP manually."
+    fi
 }
 
 install_mariadb() {
@@ -508,39 +654,70 @@ install_certbot() {
 # ============================================================================
 
 remove_existing_firewalls() {
-    log_step "Removing existing firewalls..."
+    log_step "Removing existing firewalls (UFW, firewalld, nftables)..."
 
     # Stop and disable UFW
-    if systemctl is-active --quiet ufw 2>/dev/null; then
-        log_info "Stopping UFW..."
-        systemctl stop ufw
-        systemctl disable ufw
+    if command -v ufw &>/dev/null; then
+        log_info "Disabling UFW..."
+        ufw disable 2>/dev/null || true
+        systemctl stop ufw 2>/dev/null || true
+        systemctl disable ufw 2>/dev/null || true
     fi
 
     # Remove UFW on Debian/Ubuntu
     if [ "$PKG_MANAGER" = "apt" ]; then
-        apt-get purge -y -qq ufw 2>/dev/null || true
+        log_info "Removing UFW package..."
+        apt-get purge -y ufw 2>/dev/null || true
+        apt-get autoremove -y 2>/dev/null || true
     fi
 
     # Stop and disable firewalld
-    if systemctl is-active --quiet firewalld 2>/dev/null; then
-        log_info "Stopping firewalld..."
-        systemctl stop firewalld
-        systemctl disable firewalld
+    if command -v firewall-cmd &>/dev/null || systemctl list-unit-files | grep -q firewalld; then
+        log_info "Disabling firewalld..."
+        systemctl stop firewalld 2>/dev/null || true
+        systemctl disable firewalld 2>/dev/null || true
+        systemctl mask firewalld 2>/dev/null || true
     fi
 
-    # Remove firewalld on RHEL
+    # Remove firewalld
     if [ "$PKG_MANAGER" = "dnf" ]; then
-        dnf remove -y -q firewalld 2>/dev/null || true
+        dnf remove -y firewalld 2>/dev/null || true
+    elif [ "$PKG_MANAGER" = "apt" ]; then
+        apt-get purge -y firewalld 2>/dev/null || true
+    fi
+
+    # Stop and disable nftables (Ubuntu 22.04+ default)
+    if systemctl is-active --quiet nftables 2>/dev/null; then
+        log_info "Disabling nftables..."
+        systemctl stop nftables 2>/dev/null || true
+        systemctl disable nftables 2>/dev/null || true
     fi
 
     # Clean up iptables rules
+    log_info "Flushing iptables rules..."
     iptables -F 2>/dev/null || true
     iptables -X 2>/dev/null || true
     iptables -t nat -F 2>/dev/null || true
     iptables -t nat -X 2>/dev/null || true
+    iptables -t mangle -F 2>/dev/null || true
+    iptables -t mangle -X 2>/dev/null || true
+    iptables -P INPUT ACCEPT 2>/dev/null || true
+    iptables -P FORWARD ACCEPT 2>/dev/null || true
+    iptables -P OUTPUT ACCEPT 2>/dev/null || true
 
-    log_success "Existing firewalls removed"
+    # Clean up ip6tables rules
+    ip6tables -F 2>/dev/null || true
+    ip6tables -X 2>/dev/null || true
+    ip6tables -P INPUT ACCEPT 2>/dev/null || true
+    ip6tables -P FORWARD ACCEPT 2>/dev/null || true
+    ip6tables -P OUTPUT ACCEPT 2>/dev/null || true
+
+    # Flush nftables if present
+    if command -v nft &>/dev/null; then
+        nft flush ruleset 2>/dev/null || true
+    fi
+
+    log_success "Existing firewalls removed and rules flushed"
 }
 
 change_ssh_port() {
@@ -580,8 +757,10 @@ install_csf() {
     log_step "Installing CSF (ConfigServer Security & Firewall)..."
 
     # Install Perl dependencies
+    log_info "Installing Perl dependencies..."
     if [ "$PKG_MANAGER" = "apt" ]; then
-        apt-get install -y -qq \
+        apt-get install -y \
+            perl \
             libwww-perl \
             libgd-graph-perl \
             libio-socket-ssl-perl \
@@ -590,9 +769,12 @@ install_csf() {
             libio-socket-inet6-perl \
             libsocket6-perl \
             libcrypt-openssl-rsa-perl \
-            libdigest-sha-perl
+            libdigest-sha-perl \
+            iptables \
+            ipset 2>&1 || log_warning "Some Perl dependencies may be missing"
     else
-        dnf install -y -q \
+        dnf install -y \
+            perl \
             perl-libwww-perl \
             perl-GD \
             perl-IO-Socket-SSL \
@@ -600,26 +782,95 @@ install_csf() {
             perl-Net-LibIDN \
             perl-IO-Socket-INET6 \
             perl-Socket6 \
-            perl-Crypt-OpenSSL-RSA
+            perl-Crypt-OpenSSL-RSA \
+            iptables \
+            ipset 2>&1 || log_warning "Some Perl dependencies may be missing"
     fi
 
     # Download and install CSF
+    log_info "Downloading CSF from configserver.com..."
     cd /tmp
     rm -rf csf csf.tgz
-    wget -q https://download.configserver.com/csf.tgz
-    tar -xzf csf.tgz
+
+    # Check DNS resolution first
+    if ! host download.configserver.com &>/dev/null && ! nslookup download.configserver.com &>/dev/null; then
+        log_warning "DNS resolution failed for download.configserver.com"
+        log_info "Trying to resolve via Google DNS..."
+    fi
+
+    # Try wget first, then curl as fallback
+    local download_success=false
+    log_info "Attempting download with wget..."
+    if wget --timeout=60 --tries=3 -O csf.tgz https://download.configserver.com/csf.tgz 2>&1; then
+        download_success=true
+        log_info "wget download successful"
+    else
+        log_warning "wget failed, trying curl..."
+        if curl -fSL --connect-timeout 60 --retry 3 -o csf.tgz https://download.configserver.com/csf.tgz 2>&1; then
+            download_success=true
+            log_info "curl download successful"
+        fi
+    fi
+
+    if [ "$download_success" = false ] || [ ! -s csf.tgz ]; then
+        log_error "Failed to download CSF from configserver.com"
+        log_info "Trying alternative mirror..."
+        # Try alternative download
+        if curl -fsSL -o csf.tgz "https://github.com/ConfigServer/csf/archive/refs/heads/master.zip" 2>&1; then
+            log_warning "Downloaded from GitHub mirror - may need manual extraction"
+        else
+            log_error "All download methods failed. Please check internet connectivity."
+            log_info "You can manually download CSF from: https://download.configserver.com/csf.tgz"
+            return 1
+        fi
+    fi
+
+    # Verify download
+    if [ ! -s csf.tgz ]; then
+        log_error "Downloaded file is empty"
+        return 1
+    fi
+    log_success "CSF downloaded successfully"
+
+    log_info "Extracting CSF..."
+    if ! tar -xzf csf.tgz; then
+        log_error "Failed to extract CSF"
+        return 1
+    fi
+
+    log_info "Running CSF installer..."
     cd csf
-    sh install.sh > /dev/null 2>&1
+    if sh install.sh; then
+        log_success "CSF installed successfully"
+    else
+        log_error "CSF installation failed"
+        cd /
+        rm -rf /tmp/csf /tmp/csf.tgz
+        return 1
+    fi
+
     cd /
     rm -rf /tmp/csf /tmp/csf.tgz
 
-    log_success "CSF installed"
+    # Verify CSF is installed
+    if command -v csf &>/dev/null; then
+        log_success "CSF $(csf -v 2>&1 | head -1) installed"
+    else
+        log_error "CSF command not found after installation"
+        return 1
+    fi
 }
 
 configure_csf() {
     log_step "Configuring CSF firewall..."
 
     local csf_conf="/etc/csf/csf.conf"
+
+    # Check if CSF config exists
+    if [ ! -f "$csf_conf" ]; then
+        log_warning "CSF config not found at $csf_conf - skipping configuration"
+        return 1
+    fi
 
     # Disable testing mode
     sed -i 's/^TESTING = "1"/TESTING = "0"/' "$csf_conf"
@@ -662,6 +913,12 @@ configure_lfd() {
 
     local csf_conf="/etc/csf/csf.conf"
 
+    # Check if CSF config exists
+    if [ ! -f "$csf_conf" ]; then
+        log_warning "CSF config not found - skipping LFD configuration"
+        return 1
+    fi
+
     # Login failure settings
     sed -i 's/^LF_TRIGGER = .*/LF_TRIGGER = "5"/' "$csf_conf"
     sed -i 's/^LF_TRIGGER_PERM = .*/LF_TRIGGER_PERM = "1"/' "$csf_conf"
@@ -690,21 +947,54 @@ configure_lfd() {
 start_csf() {
     log_step "Starting CSF firewall..."
 
+    # Verify CSF is installed
+    if ! command -v csf &>/dev/null; then
+        log_error "CSF is not installed. Skipping firewall start."
+        return 1
+    fi
+
     # Whitelist server IP and localhost
+    log_info "Whitelisting server IP and localhost..."
     SERVER_IP=$(get_server_ip)
+
+    # Clear any duplicate entries first
+    grep -v "# Server IP\|# Localhost" /etc/csf/csf.allow > /etc/csf/csf.allow.tmp 2>/dev/null || true
+    mv /etc/csf/csf.allow.tmp /etc/csf/csf.allow 2>/dev/null || true
+
     echo "$SERVER_IP # Server IP" >> /etc/csf/csf.allow
     echo "127.0.0.1 # Localhost" >> /etc/csf/csf.allow
     echo "::1 # Localhost IPv6" >> /etc/csf/csf.allow
+    log_info "Whitelisted: $SERVER_IP"
 
-    # Start CSF and LFD
-    csf -s > /dev/null 2>&1
-    systemctl enable csf lfd
-    systemctl start lfd
+    # Enable CSF and LFD services
+    log_info "Enabling CSF and LFD services..."
+    systemctl enable csf lfd 2>&1 || true
 
-    # Run CSF check
-    perl /usr/local/csf/bin/csftest.pl > /dev/null 2>&1 || log_warning "Some CSF features may not be available"
+    # Start CSF
+    log_info "Starting CSF firewall..."
+    if csf -s 2>&1; then
+        log_success "CSF firewall started"
+    else
+        log_warning "CSF start had warnings, checking status..."
+    fi
 
-    log_success "CSF firewall started"
+    # Start LFD
+    log_info "Starting LFD daemon..."
+    systemctl start lfd 2>&1 || true
+
+    # Run CSF compatibility check
+    log_info "Running CSF compatibility check..."
+    if perl /usr/local/csf/bin/csftest.pl 2>&1 | grep -q "FATAL"; then
+        log_warning "CSF has compatibility issues. Some features may not work."
+    else
+        log_success "CSF compatibility check passed"
+    fi
+
+    # Show CSF status
+    log_info "CSF Status:"
+    csf -l 2>&1 | head -10 || true
+
+    log_success "CSF firewall is active"
 }
 
 secure_kernel_params() {
@@ -816,39 +1106,80 @@ EOF
 install_serverhubx() {
     log_step "Installing ServerHubX application..."
 
+    local app_installed=false
+
     if [ "$DEV_MODE" = true ]; then
-        # For development, use local directory
-        log_info "Development mode: using current directory"
+        # For development, copy from current directory to SERVERHUBX_HOME
+        log_info "Development mode: copying from current directory..."
+        local current_dir=$(pwd)
+
+        # Check if we're in a directory with backend/frontend
+        if [ -d "$current_dir/backend" ] || [ -d "$current_dir/frontend" ]; then
+            mkdir -p "$SERVERHUBX_HOME"
+            cp -r "$current_dir"/* "$SERVERHUBX_HOME"/ 2>/dev/null || true
+            cp -r "$current_dir"/.* "$SERVERHUBX_HOME"/ 2>/dev/null || true
+            app_installed=true
+            log_info "Copied local files to $SERVERHUBX_HOME"
+        else
+            log_warning "No backend/frontend found in current directory"
+        fi
     else
         # Clone repository
-        git clone "$SERVERHUBX_REPO" "$SERVERHUBX_HOME" 2>/dev/null || {
-            log_warning "Could not clone repository. Please manually install ServerHubX."
-            return 1
-        }
+        log_info "Cloning ServerHubX repository..."
+        if git clone "$SERVERHUBX_REPO" "$SERVERHUBX_HOME" 2>&1; then
+            app_installed=true
+            log_success "Repository cloned successfully"
+        else
+            log_warning "Could not clone repository from $SERVERHUBX_REPO"
+        fi
+    fi
+
+    # If no app was installed, create directory structure for manual installation
+    if [ "$app_installed" = false ]; then
+        log_warning "ServerHubX application not installed automatically."
+        log_info "Creating directory structure for manual installation..."
+        mkdir -p "$SERVERHUBX_HOME"/{backend,frontend}
+        echo "# Place ServerHubX backend files here" > "$SERVERHUBX_HOME/backend/README.md"
+        echo "# Place ServerHubX frontend files here" > "$SERVERHUBX_HOME/frontend/README.md"
+        chown -R "$SERVERHUBX_USER:$SERVERHUBX_USER" "$SERVERHUBX_HOME"
+        log_info "Please manually install ServerHubX to: $SERVERHUBX_HOME"
+        return 0
     fi
 
     cd "$SERVERHUBX_HOME"
 
     # Install backend dependencies
-    if [ -d "backend" ]; then
+    if [ -d "backend" ] && [ -f "backend/package.json" ]; then
+        log_info "Installing backend dependencies..."
         cd backend
-        npm ci --silent
-        npm run build --silent
+        npm ci 2>&1 || npm install 2>&1 || log_warning "Backend npm install failed"
+        if [ -f "package.json" ] && grep -q '"build"' package.json; then
+            log_info "Building backend..."
+            npm run build 2>&1 || log_warning "Backend build failed"
+        fi
         cd ..
+    else
+        log_warning "No backend/package.json found"
     fi
 
     # Install frontend dependencies
-    if [ -d "frontend" ]; then
+    if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+        log_info "Installing frontend dependencies..."
         cd frontend
-        npm ci --silent
-        npm run build --silent
+        npm ci 2>&1 || npm install 2>&1 || log_warning "Frontend npm install failed"
+        if [ -f "package.json" ] && grep -q '"build"' package.json; then
+            log_info "Building frontend..."
+            npm run build 2>&1 || log_warning "Frontend build failed"
+        fi
         cd ..
+    else
+        log_warning "No frontend/package.json found"
     fi
 
     # Set ownership
     chown -R "$SERVERHUBX_USER:$SERVERHUBX_USER" "$SERVERHUBX_HOME"
 
-    log_success "ServerHubX installed"
+    log_success "ServerHubX installed to $SERVERHUBX_HOME"
 }
 
 create_database() {
@@ -982,8 +1313,28 @@ create_admin_user() {
 start_serverhubx() {
     log_step "Starting ServerHubX..."
 
-    # Start all services
-    systemctl restart apache2 2>/dev/null || systemctl restart httpd
+    # Start Apache
+    systemctl restart apache2 2>/dev/null || systemctl restart httpd 2>/dev/null || true
+
+    # Check if the application is actually installed
+    if [ ! -f "${SERVERHUBX_HOME}/backend/dist/main.js" ]; then
+        log_warning "ServerHubX backend not found at ${SERVERHUBX_HOME}/backend/dist/main.js"
+        log_warning "The application needs to be installed manually."
+        log_info ""
+        log_info "To install ServerHubX manually:"
+        log_info "  1. Clone/copy the ServerHubX code to ${SERVERHUBX_HOME}"
+        log_info "  2. cd ${SERVERHUBX_HOME}/backend && npm install && npm run build"
+        log_info "  3. cd ${SERVERHUBX_HOME}/frontend && npm install && npm run build"
+        log_info "  4. systemctl start serverhubx"
+        log_info ""
+
+        # Disable the service so it doesn't keep failing
+        systemctl disable serverhubx 2>/dev/null || true
+        return 1
+    fi
+
+    # Start ServerHubX
+    log_info "Starting ServerHubX service..."
     systemctl start serverhubx
 
     # Wait for service to start
@@ -993,6 +1344,8 @@ start_serverhubx() {
         log_success "ServerHubX started successfully"
     else
         log_error "ServerHubX failed to start. Check logs: journalctl -u serverhubx"
+        log_info "You can try manually: cd ${SERVERHUBX_HOME}/backend && node dist/main.js"
+        return 1
     fi
 }
 
@@ -1038,7 +1391,25 @@ EOF
 
 print_summary() {
     SERVER_IP=$(get_server_ip)
-    local admin_password=$(grep SERVERHUBX_ADMIN_PASSWORD /root/.serverhubx-credentials | cut -d= -f2)
+
+    # Get admin password (may not exist if installation failed early)
+    local admin_password="(not generated)"
+    if [ -f /root/.serverhubx-credentials ]; then
+        admin_password=$(grep SERVERHUBX_ADMIN_PASSWORD /root/.serverhubx-credentials 2>/dev/null | cut -d= -f2)
+        [ -z "$admin_password" ] && admin_password="(not generated)"
+    fi
+
+    # Get node version if available
+    local node_version="(not installed)"
+    if command -v node &>/dev/null; then
+        node_version=$(node -v 2>/dev/null || echo "(not installed)")
+    fi
+
+    # Get PHP version if available
+    local php_version="(not installed)"
+    if command -v php &>/dev/null; then
+        php_version=$(php -v 2>/dev/null | head -1 | cut -d' ' -f2 || echo "(not installed)")
+    fi
 
     echo ""
     echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════════╗${NC}"
@@ -1047,41 +1418,85 @@ print_summary() {
     echo -e "${GREEN}║                                                                   ║${NC}"
     echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
-    echo -e "${BOLD}Dashboard Access:${NC}"
-    echo -e "  URL:      ${CYAN}https://${SERVER_IP}:${SERVERHUBX_PORT}${NC}"
-    echo -e "  Email:    ${CYAN}admin@localhost${NC}"
-    echo -e "  Password: ${CYAN}${admin_password}${NC}"
+
+    if [ "$INSTALL_ERRORS" -gt 0 ]; then
+        echo -e "${YELLOW}⚠️  Installation completed with $INSTALL_ERRORS warning(s)${NC}"
+        echo -e "${YELLOW}   Some components may need manual configuration.${NC}"
+        echo ""
+    fi
+
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}                      DASHBOARD ACCESS                             ${NC}"
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
     echo ""
-    echo -e "${BOLD}${RED}IMPORTANT - SSH Port Changed!${NC}"
-    echo -e "  New SSH Command: ${YELLOW}ssh -p ${SSH_PORT} root@${SERVER_IP}${NC}"
+    echo -e "  ${BOLD}URL:${NC}      ${CYAN}https://${SERVER_IP}:${SERVERHUBX_PORT}${NC}"
+    echo -e "  ${BOLD}Email:${NC}    ${CYAN}admin@localhost${NC}"
+    echo -e "  ${BOLD}Password:${NC} ${CYAN}${admin_password}${NC}"
     echo ""
-    echo -e "${BOLD}Credentials saved to:${NC}"
-    echo -e "  ${CYAN}/root/.serverhubx-credentials${NC}"
+
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}${RED}              ⚠️  IMPORTANT - SSH PORT CHANGED!                    ${NC}"
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
     echo ""
-    echo -e "${BOLD}DNS Setup Instructions:${NC}"
-    echo -e "  ${CYAN}/root/.serverhubx-dns-setup.txt${NC}"
+    echo -e "  ${BOLD}New SSH Command:${NC} ${YELLOW}ssh -p ${SSH_PORT} root@${SERVER_IP}${NC}"
     echo ""
-    echo -e "${BOLD}Services Installed:${NC}"
-    echo -e "  - Apache Web Server"
-    echo -e "  - PHP 7.4, 8.0, 8.1, 8.2, 8.3"
-    echo -e "  - Node.js $(node -v) with PM2"
-    echo -e "  - MariaDB Database"
-    echo -e "  - Redis Cache"
-    echo -e "  - CSF Firewall"
-    [ "$SKIP_DNS" = false ] && echo -e "  - Bind9 DNS Server"
-    [ "$SKIP_MAIL" = false ] && echo -e "  - Postfix + Dovecot Mail Server"
-    echo -e "  - Let's Encrypt (Certbot)"
+    echo -e "  ${RED}WARNING: If you close this session without noting the new port,${NC}"
+    echo -e "  ${RED}you may lose access to your server!${NC}"
     echo ""
-    echo -e "${BOLD}Firewall Status:${NC}"
-    csf -l 2>/dev/null | head -5 || echo "  CSF is running"
+
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}                      INSTALLED SERVICES                           ${NC}"
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
     echo ""
-    echo -e "${BOLD}Open Ports:${NC}"
-    echo -e "  TCP IN:  ${SSH_PORT}, 80, 443, ${SERVERHUBX_PORT}"
-    [ "$SKIP_MAIL" = false ] && echo -e "  Mail:    25, 465, 587, 110, 995, 143, 993"
-    [ "$SKIP_DNS" = false ] && echo -e "  DNS:     53 (TCP/UDP)"
+    command -v apache2 &>/dev/null && echo -e "  ${GREEN}✓${NC} Apache Web Server"
+    command -v httpd &>/dev/null && echo -e "  ${GREEN}✓${NC} Apache Web Server (httpd)"
+    command -v php &>/dev/null && echo -e "  ${GREEN}✓${NC} PHP $php_version"
+    command -v node &>/dev/null && echo -e "  ${GREEN}✓${NC} Node.js $node_version"
+    command -v pm2 &>/dev/null && echo -e "  ${GREEN}✓${NC} PM2 Process Manager"
+    command -v mysql &>/dev/null && echo -e "  ${GREEN}✓${NC} MariaDB Database"
+    command -v redis-cli &>/dev/null && echo -e "  ${GREEN}✓${NC} Redis Cache"
+    command -v csf &>/dev/null && echo -e "  ${GREEN}✓${NC} CSF Firewall"
+    [ "$SKIP_DNS" = false ] && command -v named &>/dev/null && echo -e "  ${GREEN}✓${NC} Bind9 DNS Server"
+    [ "$SKIP_MAIL" = false ] && command -v postfix &>/dev/null && echo -e "  ${GREEN}✓${NC} Postfix Mail Server"
+    [ "$SKIP_MAIL" = false ] && command -v dovecot &>/dev/null && echo -e "  ${GREEN}✓${NC} Dovecot IMAP/POP3"
+    command -v certbot &>/dev/null && echo -e "  ${GREEN}✓${NC} Let's Encrypt (Certbot)"
     echo ""
-    echo -e "${YELLOW}Remember to configure your domain's DNS records!${NC}"
-    echo -e "See: /root/.serverhubx-dns-setup.txt"
+
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}                      FIREWALL STATUS                              ${NC}"
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    if command -v csf &>/dev/null; then
+        echo -e "  ${BOLD}Open Ports (TCP IN):${NC}"
+        echo -e "    ${SSH_PORT} (SSH), 80 (HTTP), 443 (HTTPS), ${SERVERHUBX_PORT} (Dashboard)"
+        [ "$SKIP_MAIL" = false ] && echo -e "    25, 465, 587 (SMTP), 110, 995 (POP3), 143, 993 (IMAP)"
+        [ "$SKIP_DNS" = false ] && echo -e "    53 (DNS)"
+        echo ""
+        csf -l 2>/dev/null | head -8 || echo "  CSF status: Running"
+    else
+        echo -e "  ${YELLOW}CSF Firewall not installed${NC}"
+    fi
+    echo ""
+
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}                      IMPORTANT FILES                              ${NC}"
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo -e "  ${BOLD}Credentials:${NC}      ${CYAN}/root/.serverhubx-credentials${NC}"
+    echo -e "  ${BOLD}DNS Setup Guide:${NC}  ${CYAN}/root/.serverhubx-dns-setup.txt${NC}"
+    echo -e "  ${BOLD}Installation Dir:${NC} ${CYAN}${SERVERHUBX_HOME}${NC}"
+    echo ""
+
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}                      NEXT STEPS                                   ${NC}"
+    echo -e "${BOLD}═══════════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo -e "  1. ${YELLOW}Note your new SSH port: ${SSH_PORT}${NC}"
+    echo -e "  2. Access the dashboard at: ${CYAN}https://${SERVER_IP}:${SERVERHUBX_PORT}${NC}"
+    echo -e "  3. Login with: admin@localhost / ${admin_password}"
+    echo -e "  4. Configure your domain's DNS (see /root/.serverhubx-dns-setup.txt)"
+    echo ""
+    echo -e "${GREEN}Installation complete! Thank you for using ServerHubX.${NC}"
     echo ""
 }
 
@@ -1139,6 +1554,9 @@ parse_args() {
 main() {
     parse_args "$@"
 
+    # Trap to ensure summary is always shown
+    trap 'show_dns_instructions 2>/dev/null; print_summary' EXIT
+
     print_banner
 
     log_step "Pre-Installation Checks"
@@ -1148,43 +1566,49 @@ main() {
     check_existing_services
 
     if ! confirm "Continue with installation?"; then
+        trap - EXIT  # Remove trap before exiting
         exit 0
     fi
 
-    # Install packages
-    install_prereqs
-    install_nodejs
-    install_apache
-    install_php
-    install_mariadb
-    install_redis
-    install_bind9
-    install_mail
-    install_certbot
+    # Install packages (continue on errors)
+    install_prereqs || { log_error "Prerequisites installation failed"; ((INSTALL_ERRORS++)); }
+    install_nodejs || { log_error "Node.js installation failed"; ((INSTALL_ERRORS++)); }
+    install_apache || { log_error "Apache installation failed"; ((INSTALL_ERRORS++)); }
+    install_php || { log_error "PHP installation failed"; ((INSTALL_ERRORS++)); }
+    install_mariadb || { log_error "MariaDB installation failed"; ((INSTALL_ERRORS++)); }
+    install_redis || { log_error "Redis installation failed"; ((INSTALL_ERRORS++)); }
+    install_bind9 || { log_warning "Bind9 installation skipped or failed"; }
+    install_mail || { log_warning "Mail server installation skipped or failed"; }
+    install_certbot || { log_warning "Certbot installation failed"; ((INSTALL_ERRORS++)); }
 
-    # Security hardening
-    remove_existing_firewalls
-    change_ssh_port
-    install_csf
-    configure_csf
-    configure_lfd
-    start_csf
-    secure_kernel_params
+    # Security hardening (continue on errors)
+    remove_existing_firewalls || { log_warning "Firewall removal had issues"; }
+    change_ssh_port || { log_warning "SSH port change failed"; ((INSTALL_ERRORS++)); }
+    install_csf || { log_error "CSF installation failed"; ((INSTALL_ERRORS++)); }
+    configure_csf || { log_warning "CSF configuration had issues"; }
+    configure_lfd || { log_warning "LFD configuration had issues"; }
+    start_csf || { log_warning "CSF start had issues"; }
+    secure_kernel_params || { log_warning "Kernel params configuration had issues"; }
 
-    # ServerHubX setup
-    create_serverhubx_user
-    setup_sudo_rules
-    create_database
-    install_serverhubx
-    create_env_file
-    create_systemd_service
-    generate_ssl_cert
-    create_admin_user
-    start_serverhubx
+    # ServerHubX setup (continue on errors)
+    create_serverhubx_user || { log_error "User creation failed"; ((INSTALL_ERRORS++)); }
+    setup_sudo_rules || { log_warning "Sudo rules setup had issues"; }
+    create_database || { log_warning "Database creation had issues"; ((INSTALL_ERRORS++)); }
+    install_serverhubx || { log_warning "ServerHubX application installation had issues"; ((INSTALL_ERRORS++)); }
+    create_env_file || { log_warning "Environment file creation had issues"; }
+    create_systemd_service || { log_warning "Systemd service creation had issues"; }
+    generate_ssl_cert || { log_warning "SSL certificate generation had issues"; }
+    create_admin_user || { log_warning "Admin user creation had issues"; }
+    start_serverhubx || { log_warning "ServerHubX start had issues"; ((INSTALL_ERRORS++)); }
 
-    # Post-installation
+    # Summary will be shown by trap
+    trap - EXIT  # Remove trap
     show_dns_instructions
     print_summary
+
+    # Exit with error code if there were issues
+    [ "$INSTALL_ERRORS" -gt 0 ] && exit 1
+    exit 0
 }
 
 main "$@"
